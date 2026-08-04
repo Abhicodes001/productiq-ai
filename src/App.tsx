@@ -43,8 +43,11 @@ export const App: React.FC = () => {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            {/* Public Landing Page */}
-            <Route path="/" element={<LandingPage />} />
+            {/* Root path opens Login page first */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            
+            {/* B2B Product Landing Page */}
+            <Route path="/landing" element={<LandingPage />} />
 
             {/* Auth Layout Routes */}
             <Route element={<AuthLayout />}>

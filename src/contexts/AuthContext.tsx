@@ -20,7 +20,7 @@ const DEMO_USER: UserProfile = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserProfile | null>(DEMO_USER);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [session, setSession] = useState<any | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const isDemo = !isSupabaseConfigured();
@@ -43,7 +43,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 role: 'Analyst',
               });
             } else {
-              // Default to null if no active session in configured Supabase
               setUser(null);
             }
           }
@@ -75,9 +74,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           authListener?.subscription?.unsubscribe();
         };
       } else {
-        // Fallback demo auth state enabled for seamless review
+        // Unauthenticated initial state
         if (mounted) {
-          setUser(DEMO_USER);
+          setUser(null);
           setLoading(false);
         }
       }
