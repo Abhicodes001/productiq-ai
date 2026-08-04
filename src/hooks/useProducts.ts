@@ -76,29 +76,23 @@ export function useProductDetail(productId?: string) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const load = useCallback(async () => {
     if (!productId) return;
-    let mounted = true;
-
-    async function load() {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await fetchProductById(productId!);
-        if (mounted) setProduct(data);
-      } catch (err: any) {
-        if (mounted) setError(err.message || 'Failed to load product details');
-      } finally {
-        if (mounted) setLoading(false);
-      }
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchProductById(productId);
+      setProduct(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load product details');
+    } finally {
+      setLoading(false);
     }
-
-    load();
-
-    return () => {
-      mounted = false;
-    };
   }, [productId]);
 
-  return { product, loading, error };
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  return { product, loading, error, refreshProduct: load };
 }

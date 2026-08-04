@@ -10,10 +10,13 @@ import {
   Globe,
   Tag,
   CheckCircle2,
+  X,
+  Trash2,
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useProducts } from '../hooks/useProducts';
+import { uploadProductDocument, uploadProductImage, startProductAnalysis } from '../services/api';
 
 export const CreateProductPage: React.FC = () => {
   const navigate = useNavigate();
@@ -24,9 +27,8 @@ export const CreateProductPage: React.FC = () => {
   const [category, setCategory] = useState('Programmable Logic Controllers');
   const [productUrl, setProductUrl] = useState('');
   
-  // File upload state placeholders
-  const [pdfFiles, setPdfFiles] = useState<string[]>([]);
-  const [imageFiles, setImageFiles] = useState<string[]>([]);
+  const [stagedPdfs, setStagedPdfs] = useState<File[]>([]);
+  const [stagedImages, setStagedImages] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const categories = [
@@ -38,18 +40,26 @@ export const CreateProductPage: React.FC = () => {
     'Human Machine Interfaces (HMI)',
   ];
 
-  const handleSimulatePdfUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePdfFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const names = Array.from(e.target.files).map((f) => f.name);
-      setPdfFiles((prev) => [...prev, ...names]);
+      const filesArr = Array.from(e.target.files);
+      setStagedPdfs((prev) => [...prev, ...filesArr]);
     }
   };
 
-  const handleSimulateImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const names = Array.from(e.target.files).map((f) => f.name);
-      setImageFiles((prev) => [...prev, ...names]);
+      const filesArr = Array.from(e.target.files);
+      setStagedImages((prev) => [...prev, ...filesArr]);
     }
+  };
+
+  const removeStagedPdf = (index: number) => {
+    setStagedPdfs((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const removeStagedImage = (index: number) => {
+    setStagedImages((prev) => prev.filter((_, idx) => idx !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -58,6 +68,7 @@ export const CreateProductPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
+      // 1. Create product record
       const created = await addProduct({
         name,
         manufacturer,
@@ -65,10 +76,23 @@ export const CreateProductPage: React.FC = () => {
         product_url: productUrl || undefined,
       });
 
+      // 2. Upload staged PDF datasheets
+      for (const pdfFile of stagedPdfs) {
+        await uploadProductDocument(created.id, pdfFile);
+      }
+
+      // 3. Upload staged Product Images
+      for (const imgFile of stagedImages) {
+        await uploadProductImage(created.id, imgFile);
+      }
+
+      // 4. Kick off ingestion pipeline analysis
+      await startProductAnalysis(created.id);
+
       setIsSubmitting(false);
       navigate(`/products/${created.id}`);
     } catch (err) {
-      console.error(err);
+      console.error("Failed to create product or upload multi-modal data:", err);
       setIsSubmitting(false);
     }
   };
@@ -137,10 +161,10 @@ export const CreateProductPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Technical Documents Upload Placeholder Card */}
+        {/* Technical Documents Upload Card */}
         <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-6 space-y-4">
           <h2 className="text-xs font-bold text-slate-100 uppercase tracking-wider border-b border-slate-800/80 pb-2">
-            2. Technical Sources & Media Uploads (Phase 1 Visual Placeholder)
+            2. Technical Datasheets & Multimodal Image Sources
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -150,8 +174,8 @@ export const CreateProductPage: React.FC = () => {
                 type="file"
                 accept=".pdf"
                 multiple
-                onChange={handleSimulatePdfUpload}
-                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                onChange={handlePdfFileSelect}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
               />
               <div className="p-3 rounded-full bg-slate-900 border border-slate-800 text-sky-400 inline-block mb-2 group-hover:scale-105 transition-transform">
                 <FileText className="w-5 h-5" />
@@ -163,12 +187,25 @@ export const CreateProductPage: React.FC = () => {
                 Drag and drop PDF files here or click to browse (Max 50MB)
               </p>
 
-              {pdfFiles.length > 0 && (
-                <div className="mt-3 text-left space-y-1">
-                  {pdfFiles.map((file, idx) => (
-                    <div key={idx} className="flex items-center gap-1.5 text-[11px] text-sky-400 font-mono bg-sky-950/40 px-2 py-1 rounded border border-sky-900/50">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                      <span className="truncate">{file}</span>
+              {stagedPdfs.length > 0 && (
+                <div className="mt-3 text-left space-y-1.5 z-20 relative">
+                  {stagedPdfs.map((file, idx) => (
+                    <div key={idx} className="flex items-center justify-between gap-1.5 text-[11px] text-sky-400 font-mono bg-sky-950/60 px-2 py-1.5 rounded border border-sky-900/60">
+                      <div className="flex items-center gap-1.5 overflow-hidden">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span className="truncate">{file.name}</span>
+                        <span className="text-[10px] text-slate-500 shrink-0">({(file.size / (1024 * 1024)).toFixed(2)} MB)</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeStagedPdf(idx);
+                        }}
+                        className="text-slate-400 hover:text-rose-400 p-0.5"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -176,13 +213,13 @@ export const CreateProductPage: React.FC = () => {
             </div>
 
             {/* Image Upload Box */}
-            <div className="border-2 border-dashed border-slate-800 hover:border-sky-500/60 transition-colors rounded-lg p-6 text-center bg-slate-950/40 relative group">
+            <div className="border-2 border-dashed border-slate-800 hover:border-indigo-500/60 transition-colors rounded-lg p-6 text-center bg-slate-950/40 relative group">
               <input
                 type="file"
                 accept="image/*"
                 multiple
-                onChange={handleSimulateImageUpload}
-                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                onChange={handleImageFileSelect}
+                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
               />
               <div className="p-3 rounded-full bg-slate-900 border border-slate-800 text-indigo-400 inline-block mb-2 group-hover:scale-105 transition-transform">
                 <ImageIcon className="w-5 h-5" />
@@ -194,12 +231,25 @@ export const CreateProductPage: React.FC = () => {
                 Drag and drop PNG, JPG, or WEBP photos for OCR extraction
               </p>
 
-              {imageFiles.length > 0 && (
-                <div className="mt-3 text-left space-y-1">
-                  {imageFiles.map((file, idx) => (
-                    <div key={idx} className="flex items-center gap-1.5 text-[11px] text-indigo-400 font-mono bg-indigo-950/40 px-2 py-1 rounded border border-indigo-900/50">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                      <span className="truncate">{file}</span>
+              {stagedImages.length > 0 && (
+                <div className="mt-3 text-left space-y-1.5 z-20 relative">
+                  {stagedImages.map((file, idx) => (
+                    <div key={idx} className="flex items-center justify-between gap-1.5 text-[11px] text-indigo-400 font-mono bg-indigo-950/60 px-2 py-1.5 rounded border border-indigo-900/60">
+                      <div className="flex items-center gap-1.5 overflow-hidden">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span className="truncate">{file.name}</span>
+                        <span className="text-[10px] text-slate-500 shrink-0">({(file.size / (1024 * 1024)).toFixed(2)} MB)</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeStagedImage(idx);
+                        }}
+                        className="text-slate-400 hover:text-rose-400 p-0.5"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -218,7 +268,7 @@ export const CreateProductPage: React.FC = () => {
             Cancel
           </Button>
           <Button type="submit" className="gap-2" disabled={isSubmitting}>
-            <span>{isSubmitting ? 'Creating...' : 'Continue to Data Sources'}</span>
+            <span>{isSubmitting ? 'Creating & Ingesting Data...' : 'Submit & Start Extraction'}</span>
             <ArrowRight className="w-4 h-4" />
           </Button>
         </div>

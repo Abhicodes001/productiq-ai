@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -13,21 +13,75 @@ import {
   CheckCircle2,
   Database,
   Cpu,
+  RefreshCw,
+  Clock,
+  Globe,
+  Image as ImageIcon,
+  Play,
+  Loader2,
 } from 'lucide-react';
 import { useProductDetail } from '../hooks/useProducts';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { EmptyState } from '../components/common/EmptyState';
 import { Button } from '../components/ui/Button';
 import { formatDate, formatPercentage } from '../lib/utils';
+import { fetchJobStatus, startProductAnalysis } from '../services/api';
+import { JobStatusResponse } from '../types/product';
 
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { product, loading, error } = useProductDetail(id);
+  const { product, loading, error, refreshProduct } = useProductDetail(id);
 
   const [activeTab, setActiveTab] = useState<
     'overview' | 'specs' | 'sources' | 'validation' | 'review' | 'export'
   >('overview');
+
+  const [jobStatus, setJobStatus] = useState<JobStatusResponse | null>(null);
+  const [isTriggering, setIsTriggering] = useState(false);
+
+  // Poll processing job status if product status is 'processing'
+  useEffect(() => {
+    if (!id) return;
+    let timer: any = null;
+
+    const checkStatus = async () => {
+      try {
+        const res = await fetchJobStatus(id);
+        setJobStatus(res);
+        if (res.status === 'completed' || res.status === 'failed') {
+          refreshProduct();
+        }
+      } catch (err) {
+        console.error("Job status check error:", err);
+      }
+    };
+
+    checkStatus();
+
+    if (product?.status === 'processing') {
+      timer = setInterval(checkStatus, 2000);
+    }
+
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [id, product?.status]);
+
+  const handleRunAnalysis = async () => {
+    if (!id) return;
+    setIsTriggering(true);
+    try {
+      await startProductAnalysis(id);
+      await refreshProduct();
+      const statusRes = await fetchJobStatus(id);
+      setJobStatus(statusRes);
+    } catch (err) {
+      console.error("Failed to start analysis:", err);
+    } finally {
+      setIsTriggering(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -106,19 +160,86 @@ export const ProductDetailPage: React.FC = () => {
           )}
         </div>
 
-        {/* Confidence Score Pill */}
-        <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 shrink-0 flex flex-col items-end">
-          <span className="text-[10px] font-mono uppercase text-slate-400">
-            Extraction Confidence
-          </span>
-          <span className="text-2xl font-bold font-mono text-sky-400">
-            {formatPercentage(product.confidence_score)}
-          </span>
-          <span className="text-[10px] text-slate-500 font-mono">
-            {product.attributes?.length || 0} extracted attributes
-          </span>
+        {/* Action Controls & Confidence Score */}
+        <div className="flex items-center gap-4 shrink-0">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleRunAnalysis}
+            disabled={isTriggering || product.status === 'processing'}
+            className="gap-1.5 font-mono text-xs"
+          >
+            {isTriggering || product.status === 'processing' ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-sky-400" />
+                <span>Processing...</span>
+              </>
+            ) : (
+              <>
+                <Play className="w-3.5 h-3.5 text-sky-400" />
+                <span>Run Ingestion Engine</span>
+              </>
+            )}
+          </Button>
+
+          <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 flex flex-col items-end">
+            <span className="text-[10px] font-mono uppercase text-slate-400">
+              Extraction Confidence
+            </span>
+            <span className="text-2xl font-bold font-mono text-sky-400">
+              {formatPercentage(product.confidence_score)}
+            </span>
+            <span className="text-[10px] text-slate-500 font-mono">
+              {product.attributes?.length || 0} extracted attributes
+            </span>
+          </div>
         </div>
       </div>
+
+      {/* PHASE 2: Live Ingestion Pipeline Stage Stepper Banner */}
+      {jobStatus && (
+        <div className="bg-slate-950 border border-sky-900/60 rounded-lg p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Cpu className="w-4 h-4 text-sky-400 animate-pulse" />
+              <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
+                Multi-Modal Ingestion Pipeline Status
+              </h3>
+            </div>
+            <span className="text-xs font-mono text-sky-400 font-semibold">
+              {jobStatus.progress}% Complete
+            </span>
+          </div>
+
+          {/* Stepper Stage Nodes */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2 pt-1">
+            {jobStatus.stages_breakdown.map((st, idx) => (
+              <div
+                key={st.code}
+                className={`p-2.5 rounded border text-[11px] font-mono space-y-1 transition-all ${
+                  st.status === 'completed'
+                    ? 'bg-sky-950/40 border-sky-800/80 text-sky-300'
+                    : st.status === 'in_progress'
+                    ? 'bg-amber-950/50 border-amber-500/80 text-amber-300 animate-pulse'
+                    : 'bg-slate-900/40 border-slate-800/80 text-slate-500'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold opacity-75">#{idx + 1}</span>
+                  {st.status === 'completed' ? (
+                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                  ) : st.status === 'in_progress' ? (
+                    <Loader2 className="w-3 h-3 text-amber-400 animate-spin" />
+                  ) : (
+                    <Clock className="w-3 h-3 text-slate-600" />
+                  )}
+                </div>
+                <p className="font-medium leading-tight truncate">{st.name}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Detail Navigation Tabs */}
       <div className="border-b border-slate-800 flex overflow-x-auto space-x-1">
@@ -242,13 +363,64 @@ export const ProductDetailPage: React.FC = () => {
         {activeTab === 'sources' && (
           <div className="space-y-4">
             <h2 className="text-xs font-bold text-slate-100 uppercase tracking-wider border-b border-slate-800/80 pb-2">
-              Source Citation & Document Lineage
+              Source Citation & Multi-Modal Data Lineage
             </h2>
-            <EmptyState
-              icon={Database}
-              title="Sources Lineage View"
-              description="Lineage tracing maps extracted attributes directly back to exact PDF page numbers, visual bounding boxes, and HTTP web citations."
-            />
+
+            {(product.sources && product.sources.length > 0) || (product.documents && product.documents.length > 0) ? (
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 gap-3">
+                  {product.sources?.map((src) => (
+                    <div key={src.id} className="bg-slate-950 p-4 rounded-lg border border-slate-800 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded bg-slate-900 border border-slate-800 text-sky-400">
+                          {src.source_type === 'website' ? (
+                            <Globe className="w-4 h-4 text-sky-400" />
+                          ) : src.source_type === 'pdf' ? (
+                            <FileText className="w-4 h-4 text-emerald-400" />
+                          ) : (
+                            <ImageIcon className="w-4 h-4 text-indigo-400" />
+                          )}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-slate-200">{src.source_name}</span>
+                            <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400">
+                              {src.source_type}
+                            </span>
+                          </div>
+                          {src.source_url && (
+                            <p className="text-[11px] font-mono text-slate-400 mt-0.5 truncate max-w-md">{src.source_url}</p>
+                          )}
+                          {src.storage_path && (
+                            <p className="text-[11px] font-mono text-slate-500 mt-0.5">{src.storage_path}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4 text-right">
+                        <div>
+                          <span className="text-[10px] font-mono text-slate-500 block">Reliability</span>
+                          <span className="text-xs font-mono font-bold text-sky-400">
+                            {formatPercentage(src.reliability_score || 0.95)}
+                          </span>
+                        </div>
+                        <span className={`text-[10px] font-mono px-2 py-1 rounded ${
+                          src.status === 'processed' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'
+                        }`}>
+                          {src.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <EmptyState
+                icon={Database}
+                title="No Data Sources Attached"
+                description="Attach website URLs, PDF technical datasheets, or nameplate image scans to enable automated spec extraction."
+              />
+            )}
           </div>
         )}
 
