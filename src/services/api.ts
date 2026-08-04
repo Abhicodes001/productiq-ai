@@ -1,4 +1,4 @@
-import { Product, CreateProductInput } from '../types/product';
+import { Product, CreateProductInput, ProductAttribute } from '../types/product';
 
 const API_BASE_URL = '/api';
 
@@ -309,6 +309,57 @@ export async function startProductAnalysis(productId: string): Promise<any> {
     status: 'processing',
     current_stage: 'input_received',
     progress: 20,
+  };
+}
+
+export async function processProductDocuments(productId: string): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/process-documents`, {
+      method: 'POST',
+    });
+    if (response.ok) return await response.json();
+  } catch (error) {
+    console.warn('Backend API offline, starting simulated document processing:', error);
+  }
+  return startProductAnalysis(productId);
+}
+
+export async function extractProductAttributes(productId: string): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/extract`, {
+      method: 'POST',
+    });
+    if (response.ok) return await response.json();
+  } catch (error) {
+    console.warn('Backend API offline, starting simulated attribute extraction:', error);
+  }
+  return startProductAnalysis(productId);
+}
+
+export async function fetchProductAttributes(productId: string): Promise<ProductAttribute[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/attributes`);
+    if (response.ok) return await response.json();
+  } catch (error) {
+    console.warn('Backend API offline, reading client store attributes:', error);
+  }
+
+  const prod = localProductsStore.find((p) => p.id === productId);
+  return (prod?.attributes as ProductAttribute[]) || [];
+}
+
+export async function fetchProductSources(productId: string): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/sources`);
+    if (response.ok) return await response.json();
+  } catch (error) {
+    console.warn('Backend API offline, reading client store sources:', error);
+  }
+
+  const prod = localProductsStore.find((p) => p.id === productId);
+  return {
+    sources: prod?.sources || [],
+    documents: prod?.documents || [],
   };
 }
 

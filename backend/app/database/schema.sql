@@ -54,15 +54,19 @@ CREATE TABLE IF NOT EXISTS public.documents (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- 5. PRODUCT ATTRIBUTES TABLE
+-- 5. PRODUCT ATTRIBUTES TABLE (Updated for Phase 3 Document Intelligence)
 CREATE TABLE IF NOT EXISTS public.product_attributes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     product_id UUID NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+    attribute_name VARCHAR(255) NOT NULL,
     key VARCHAR(255) NOT NULL,
-    value TEXT NOT NULL,
+    value TEXT,
     unit VARCHAR(50),
     confidence FLOAT DEFAULT 1.0 CHECK (confidence >= 0.0 AND confidence <= 1.0),
+    status VARCHAR(50) DEFAULT 'unverified' CHECK (status IN ('verified', 'unverified', 'not_found', 'missing')),
     source_id UUID REFERENCES public.sources(id) ON DELETE SET NULL,
+    source_location VARCHAR(255),
+    extraction_method VARCHAR(100) DEFAULT 'llm_extraction',
     verified BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

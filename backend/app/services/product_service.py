@@ -329,13 +329,12 @@ class ProductService:
     @staticmethod
     def get_job_status(product_id: str) -> Optional[dict]:
         stage_order = [
-            ("input_received", "Input received"),
-            ("website_processing", "Website processing"),
-            ("documents_processing", "Documents processing"),
-            ("images_processing", "Images processing"),
-            ("ai_extraction", "AI extraction"),
-            ("validation", "Validation"),
-            ("finalization", "Finalization"),
+            ("input_validation", "Input validation"),
+            ("website_extraction", "Website extraction"),
+            ("pdf_extraction", "PDF extraction"),
+            ("image_analysis", "Image analysis"),
+            ("attribute_extraction", "Attribute extraction"),
+            ("structured_storage", "Structured data storage"),
         ]
 
         job = MOCK_JOBS_DB.get(product_id)

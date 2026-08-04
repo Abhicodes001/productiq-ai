@@ -4,12 +4,17 @@ export type SourceStatus = 'pending' | 'processing' | 'processed' | 'failed';
 
 export interface ProductAttribute {
   id: string;
+  product_id?: string;
+  attribute_name?: string;
   key: string;
-  value: string;
-  unit?: string;
+  value: string | null;
+  unit?: string | null;
   confidence: number;
-  source_id?: string;
-  verified: boolean;
+  status?: 'verified' | 'unverified' | 'not_found' | 'missing';
+  source_id?: string | null;
+  source_location?: string | null;
+  extraction_method?: string | null;
+  verified?: boolean;
 }
 
 export interface ProductSource {

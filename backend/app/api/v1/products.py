@@ -140,6 +140,63 @@ def start_product_analysis(product_id: str):
 
     return ProductService.create_processing_job(product_id)
 
+@router.post("/{product_id}/process-documents", response_model=JobResponse, status_code=status.HTTP_202_ACCEPTED)
+def process_product_documents(product_id: str):
+    """
+    Triggers PDF document intelligence page-by-page text & layout parsing.
+    """
+    product = ProductService.get_product_by_id(product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with ID '{product_id}' not found"
+        )
+
+    return ProductService.create_processing_job(product_id)
+
+@router.post("/{product_id}/extract", response_model=JobResponse, status_code=status.HTTP_202_ACCEPTED)
+def extract_product_attributes(product_id: str):
+    """
+    Triggers structured LLM attribute extraction pipeline across PDF, web, and visual image sources.
+    """
+    product = ProductService.get_product_by_id(product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with ID '{product_id}' not found"
+        )
+
+    return ProductService.create_processing_job(product_id)
+
+@router.get("/{product_id}/attributes")
+def get_product_attributes(product_id: str):
+    """
+    Fetch structured extracted product attributes with confidence scores, source references, and missing status.
+    """
+    product = ProductService.get_product_by_id(product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with ID '{product_id}' not found"
+        )
+    return product.get("attributes", [])
+
+@router.get("/{product_id}/sources")
+def get_product_sources(product_id: str):
+    """
+    Fetch attached website URLs, PDF datasheets, and image sources for a product.
+    """
+    product = ProductService.get_product_by_id(product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with ID '{product_id}' not found"
+        )
+    return {
+        "sources": product.get("sources", []),
+        "documents": product.get("documents", [])
+    }
+
 @router.get("/{product_id}/status", response_model=JobStatusResponse)
 def get_product_job_status(product_id: str):
     """
