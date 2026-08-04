@@ -1,0 +1,213 @@
+import React from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import {
+  Boxes,
+  CheckCircle2,
+  AlertTriangle,
+  FileCheck2,
+  BarChart3,
+  Plus,
+  ArrowRight,
+  ExternalLink,
+  Eye,
+} from 'lucide-react';
+import { StatCard } from '../components/common/StatCard';
+import { StatusBadge } from '../components/common/StatusBadge';
+import { Button } from '../components/ui/Button';
+import { useProducts } from '../hooks/useProducts';
+import { formatDate, formatPercentage } from '../lib/utils';
+
+export const DashboardPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { products, loading } = useProducts();
+
+  // Metrics calculations
+  const totalProducts = products.length;
+  const verifiedProducts = products.filter((p) => p.status === 'verified').length;
+  const needsReview = products.filter((p) => p.status === 'needs_review').length;
+  const conflictsDetected = products.reduce((acc, p) => acc + (p.conflicts_count || 0), 0);
+  const avgConfidence =
+    totalProducts > 0
+      ? products.reduce((acc, p) => acc + p.confidence_score, 0) / totalProducts
+      : 0;
+
+  return (
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+        <div>
+          <h1 className="text-xl font-bold text-slate-100 tracking-tight">
+            Intelligence Dashboard
+          </h1>
+          <p className="text-xs text-slate-400 mt-1">
+            Real-time status overview of extracted, enriched, and validated industrial products.
+          </p>
+        </div>
+        <Button onClick={() => navigate('/products/create')} className="gap-2">
+          <Plus className="w-4 h-4" />
+          <span>Create Product</span>
+        </Button>
+      </div>
+
+      {/* KPI Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <StatCard
+          title="Total Products"
+          value={totalProducts}
+          icon={Boxes}
+          change="+12% this mo"
+          changeType="positive"
+          subtext="Active in platform"
+          accentColor="text-sky-400"
+        />
+        <StatCard
+          title="Verified Products"
+          value={verifiedProducts}
+          icon={CheckCircle2}
+          change={`${Math.round((verifiedProducts / (totalProducts || 1)) * 100)}% total`}
+          changeType="positive"
+          subtext="High confidence specs"
+          accentColor="text-emerald-400"
+        />
+        <StatCard
+          title="Needs Review"
+          value={needsReview}
+          icon={FileCheck2}
+          change="Action required"
+          changeType="neutral"
+          subtext="Human review queue"
+          accentColor="text-amber-400"
+        />
+        <StatCard
+          title="Conflicts Detected"
+          value={conflictsDetected}
+          icon={AlertTriangle}
+          change={conflictsDetected > 0 ? "Requires resolution" : "Clear"}
+          changeType={conflictsDetected > 0 ? "negative" : "positive"}
+          subtext="Cross-source discrepancies"
+          accentColor="text-rose-400"
+        />
+        <StatCard
+          title="Average Confidence"
+          value={formatPercentage(avgConfidence)}
+          icon={BarChart3}
+          change="+3.4% accuracy"
+          changeType="positive"
+          subtext="Overall dataset score"
+          accentColor="text-indigo-400"
+        />
+      </div>
+
+      {/* Recent Products Table Section */}
+      <div className="bg-slate-900/90 border border-slate-800 rounded-lg shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-800/80 flex items-center justify-between">
+          <div>
+            <h2 className="text-sm font-bold text-slate-100 uppercase tracking-wider">
+              Recent Products
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Latest industrial datasheets and catalog records processed.
+            </p>
+          </div>
+          <Link
+            to="/products"
+            className="text-xs font-semibold text-sky-400 hover:text-sky-300 flex items-center gap-1 font-mono"
+          >
+            <span>View All ({totalProducts})</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        {loading ? (
+          <div className="p-12 text-center text-xs text-slate-500 font-mono">
+            Loading products intelligence feed...
+          </div>
+        ) : products.length === 0 ? (
+          <div className="p-12 text-center text-xs text-slate-500 font-mono">
+            No products found. Click "Create Product" to add your first product.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-950/60 text-slate-400 font-mono border-b border-slate-800 text-[11px]">
+                <tr>
+                  <th className="px-6 py-3 font-semibold">PRODUCT</th>
+                  <th className="px-6 py-3 font-semibold">MANUFACTURER</th>
+                  <th className="px-6 py-3 font-semibold">CATEGORY</th>
+                  <th className="px-6 py-3 font-semibold">STATUS</th>
+                  <th className="px-6 py-3 font-semibold">CONFIDENCE</th>
+                  <th className="px-6 py-3 font-semibold">UPDATED</th>
+                  <th className="px-6 py-3 font-semibold text-right">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                {products.slice(0, 6).map((product) => (
+                  <tr
+                    key={product.id}
+                    className="hover:bg-slate-800/50 transition-colors group cursor-pointer"
+                    onClick={() => navigate(`/products/${product.id}`)}
+                  >
+                    <td className="px-6 py-3.5 font-medium text-slate-100">
+                      <div className="flex flex-col">
+                        <span className="group-hover:text-sky-400 transition-colors font-semibold">
+                          {product.name}
+                        </span>
+                        {product.product_url && (
+                          <span className="text-[10px] text-slate-500 font-mono truncate max-w-xs">
+                            {product.product_url}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-3.5 font-mono text-slate-300">
+                      {product.manufacturer}
+                    </td>
+                    <td className="px-6 py-3.5 text-slate-400">
+                      <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700/60 text-[11px]">
+                        {product.category}
+                      </span>
+                    </td>
+                    <td className="px-6 py-3.5">
+                      <StatusBadge status={product.status} />
+                    </td>
+                    <td className="px-6 py-3.5 font-mono">
+                      <div className="flex items-center gap-2">
+                        <div className="w-16 bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full ${
+                              product.confidence_score >= 0.8
+                                ? 'bg-emerald-500'
+                                : product.confidence_score >= 0.5
+                                ? 'bg-amber-500'
+                                : 'bg-rose-500'
+                            }`}
+                            style={{ width: `${product.confidence_score * 100}%` }}
+                          />
+                        </div>
+                        <span className="text-[11px] font-bold text-slate-300">
+                          {formatPercentage(product.confidence_score)}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-3.5 font-mono text-[11px] text-slate-400">
+                      {formatDate(product.updated_at)}
+                    </td>
+                    <td className="px-6 py-3.5 text-right" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={() => navigate(`/products/${product.id}`)}
+                        className="p-1.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors"
+                        title="View Details"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
