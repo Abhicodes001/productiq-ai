@@ -1,4 +1,4 @@
-export type ProductStatus = 'processing' | 'needs_review' | 'verified' | 'failed' | 'draft';
+export type ProductStatus = 'processing' | 'needs_review' | 'verified' | 'human_verified' | 'conflict' | 'failed' | 'draft' | string;
 export type SourceType = 'website' | 'pdf' | 'image' | 'manual';
 export type SourceStatus = 'pending' | 'processing' | 'processed' | 'failed';
 

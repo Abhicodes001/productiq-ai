@@ -623,7 +623,7 @@ export async function fetchEnrichmentSummary(productId: string): Promise<any> {
   const enrichedCount = attrs.filter((a) => a.status === 'ai_enriched').length;
   const reviewCount = attrs.filter((a) => a.status === 'needs_review').length;
 
-  return {
+    return {
     product_id: productId,
     extracted_count: extractedCount || 4,
     ai_enriched_count: enrichedCount || 4,
@@ -632,4 +632,207 @@ export async function fetchEnrichmentSummary(productId: string): Promise<any> {
     overall_completeness_percent: 92.5,
     source_priority_breakdown: { P1: 4, P2: 2, P3: 2, P4: 1, P5: 0 }
   };
+}
+
+// ==========================================
+// PHASE 6: VALIDATION & HUMAN REVIEW API
+// ==========================================
+
+export const mockConflictsStore: Record<string, any[]> = {
+  '22222222-2222-2222-2222-222222222222': [
+    {
+      id: 'conf-101',
+      product_id: '22222222-2222-2222-2222-222222222222',
+      product_name: 'Schneider Electric Altivar Process ATV930 45kW',
+      attribute_name: 'Input Supply Voltage',
+      key: 'Supply Voltage',
+      current_value: '380...480 V',
+      status: 'conflict',
+      candidates: [
+        {
+          candidate_id: 'cand-1',
+          value: '380...480 V',
+          unit: 'V',
+          source_name: 'ATV930 Technical Datasheet.pdf (p.3)',
+          source_type: 'pdf',
+          confidence: 0.88,
+          evidence_text: 'Rated supply voltage: 3-phase 380V to 480V AC 50/60Hz.'
+        },
+        {
+          candidate_id: 'cand-2',
+          value: '400 V AC',
+          unit: 'V',
+          source_name: 'Official Schneider Electric Website Catalog',
+          source_type: 'website',
+          source_url: 'https://www.se.com/ww/en/product/ATV930D45N4',
+          confidence: 0.94,
+          evidence_text: 'Nominal operational rating: 400 V 3-Phase.'
+        }
+      ],
+      created_at: new Date(Date.now() - 3600000 * 2).toISOString()
+    }
+  ]
+};
+
+export const mockReviewHistoryStore: Record<string, any[]> = {
+  '11111111-1111-1111-1111-111111111111': [
+    {
+      id: 'rev-h1',
+      product_id: '11111111-1111-1111-1111-111111111111',
+      attribute_name: 'Work Memory (Program)',
+      key: 'Work Memory (Program)',
+      previous_value: '512 KB',
+      final_value: '1 MB',
+      reviewer: 'Abhishek M (Lead Engineer)',
+      action: 'select_candidate',
+      timestamp: new Date(Date.now() - 86400000).toISOString()
+    }
+  ]
+};
+
+export async function validateProductSources(productId: string): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/validate`, { method: 'POST' });
+    if (response.ok) return await response.json();
+  } catch (error) {
+    console.warn('Backend API offline, running client validator:', error);
+  }
+
+  const prod = localProductsStore.find((p) => p.id === productId);
+  const attrs = prod?.attributes || [];
+  const confCount = prod?.conflicts_count || 0;
+
+  return {
+    product_id: productId,
+    total_attributes_validated: attrs.length || 6,
+    matching_specs_count: Math.max(0, attrs.length - confCount),
+    conflicts_count: confCount,
+    low_confidence_count: attrs.filter((a) => a.confidence < 0.75).length,
+    unverified_enriched_count: attrs.filter((a) => a.status === 'ai_enriched' && !a.verified).length,
+    overall_confidence: (prod?.confidence_score || 0.92) * 100,
+    confidence_tier: (prod?.confidence_score || 0.9) >= 0.9 ? 'High Confidence' : 'Medium Confidence',
+    validation_status: confCount > 0 ? 'conflict' : (prod?.status === 'verified' ? 'human_verified' : 'needs_review')
+  };
+}
+
+export async function fetchProductConflicts(productId: string): Promise<any[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/conflicts`);
+    if (response.ok) return await response.json();
+  } catch (error) {
+    console.warn('Backend API offline, fetching local conflicts:', error);
+  }
+
+  return mockConflictsStore[productId] || [];
+}
+
+export async function resolveProductConflict(
+  productId: string,
+  conflictId: string,
+  actionData: {
+    action: string;
+    selected_candidate_id?: string;
+    manual_value?: string;
+    manual_unit?: string;
+    reviewer_name?: string;
+    notes?: string;
+  }
+): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/conflicts/${conflictId}/resolve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(actionData),
+    });
+    if (response.ok) return await response.json();
+  } catch (error) {
+    console.warn('Backend API offline, executing local conflict resolution:', error);
+  }
+
+  const conflicts = mockConflictsStore[productId] || [];
+  const confItem = conflicts.find((c) => c.id === conflictId);
+  const prevVal = confItem?.current_value || 'Previous Value';
+
+  let finalVal = prevVal;
+  if (actionData.action === 'select_candidate') {
+    const cand = confItem?.candidates?.find((c: any) => c.candidate_id === actionData.selected_candidate_id);
+    if (cand) finalVal = `${cand.value} ${cand.unit || ''}`.trim();
+  } else if (actionData.action === 'edit_manual') {
+    finalVal = `${actionData.manual_value || ''} ${actionData.manual_unit || ''}`.trim();
+  } else if (actionData.action === 'mark_na') {
+    finalVal = 'N/A (Not Applicable)';
+  } else if (actionData.action === 'reject_ai') {
+    finalVal = 'Rejected by Human Engineer';
+  }
+
+  const prod = localProductsStore.find((p) => p.id === productId);
+  if (prod) {
+    prod.status = 'human_verified';
+    prod.conflicts_count = Math.max(0, (prod.conflicts_count || 1) - 1);
+    if (prod.attributes && confItem) {
+      const attr = prod.attributes.find((a) => a.key === confItem.key);
+      if (attr) {
+        attr.value = finalVal;
+        attr.status = 'human_verified';
+        attr.verified = true;
+        attr.confidence = 1.0;
+      }
+    }
+  }
+
+  mockConflictsStore[productId] = conflicts.filter((c) => c.id !== conflictId);
+
+  const historyRecord = {
+    id: crypto.randomUUID(),
+    product_id: productId,
+    attribute_name: confItem?.attribute_name || 'Specification',
+    key: confItem?.key || 'Spec Key',
+    previous_value: prevVal,
+    final_value: finalVal,
+    reviewer: actionData.reviewer_name || 'Abhishek M (Lead Engineer)',
+    action: actionData.action,
+    timestamp: new Date().toISOString()
+  };
+
+  if (!mockReviewHistoryStore[productId]) mockReviewHistoryStore[productId] = [];
+  mockReviewHistoryStore[productId].unshift(historyRecord);
+
+  return {
+    status: 'success',
+    message: `Conflict for '${confItem?.attribute_name || 'attribute'}' resolved successfully.`,
+    review_record: historyRecord
+  };
+}
+
+export async function fetchReviewHistory(productId: string): Promise<any[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/review-history`);
+    if (response.ok) return await response.json();
+  } catch (error) {
+    console.warn('Backend API offline, fetching local review history:', error);
+  }
+
+  return mockReviewHistoryStore[productId] || [];
+}
+
+export async function fetchGlobalReviewQueue(): Promise<any[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/review-center/queue`);
+    if (response.ok) return await response.json();
+  } catch (error) {
+    console.warn('Backend API offline, fetching global review queue:', error);
+  }
+
+  const queue: any[] = [];
+  for (const pid of Object.keys(mockConflictsStore)) {
+    const prod = localProductsStore.find((p) => p.id === pid);
+    const pname = prod ? prod.name : 'Industrial Equipment Product';
+    for (const c of mockConflictsStore[pid]) {
+      queue.push({
+        ...c,
+        product_name: pname
+      });
+    }
+  }
+  return queue;
 }

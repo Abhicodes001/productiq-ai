@@ -18,10 +18,17 @@ from app.schemas.enrichment import (
     EnrichmentResponse,
     EnrichmentSummaryResponse,
 )
+from app.schemas.validation import (
+    ConflictItem,
+    ReviewActionRequest,
+    ReviewHistoryItem,
+    ValidationSummary,
+)
 from app.services.product_service import ProductService
 from app.rag.rag_service import RAGService
 from app.agents.missing_data_detector import MissingDataDetector
 from app.agents.orchestrator import ProductIntelligenceOrchestrator
+from app.validation.validator import ValidationEngine
 
 router = APIRouter()
 
@@ -370,6 +377,51 @@ def get_product_enrichment_summary(product_id: str):
         )
 
     return ProductIntelligenceOrchestrator.get_enrichment_summary(product_id=product_id)
+
+# ==========================================
+# PHASE 6: VALIDATION, CONFLICT DETECTION & HUMAN REVIEW ENDPOINTS
+# ==========================================
+
+@router.post("/{product_id}/validate", response_model=ValidationSummary)
+def validate_product_sources(product_id: str):
+    """
+    Execute cross-source validation across PDF, Web, Catalogs, Vision OCR, and AI Enrichment.
+    """
+    product = ProductService.get_product_by_id(product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with ID '{product_id}' not found"
+        )
+    return ValidationEngine.validate_product(product_id)
+
+@router.get("/{product_id}/conflicts", response_model=List[ConflictItem])
+def get_product_conflicts(product_id: str):
+    """
+    Fetch open attribute conflicts and candidate values requiring human review.
+    """
+    return ValidationEngine.get_conflicts(product_id)
+
+@router.post("/{product_id}/conflicts/{conflict_id}/resolve")
+def resolve_product_conflict(product_id: str, conflict_id: str, action_in: ReviewActionRequest):
+    """
+    Execute human review action (select candidate A/B, manual edit, mark NA, reject AI) and update attribute status to human_verified.
+    """
+    return ValidationEngine.resolve_conflict(product_id, conflict_id, action_in.dict())
+
+@router.get("/{product_id}/review-history", response_model=List[ReviewHistoryItem])
+def get_product_review_history(product_id: str):
+    """
+    Fetch audit trail history log of resolved human review actions.
+    """
+    return ValidationEngine.get_review_history(product_id)
+
+@router.get("/review-center/queue")
+def get_global_review_queue():
+    """
+    Fetch active global review queue across all products.
+    """
+    return ValidationEngine.get_global_review_queue()
 
 def os_ext(filename: str) -> str:
     import os

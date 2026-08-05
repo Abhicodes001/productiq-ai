@@ -67,10 +67,12 @@ export const ProductsPage: React.FC = () => {
               className="bg-transparent border-none focus:outline-none text-slate-200 font-mono"
             >
               <option value="all" className="bg-slate-900 text-slate-200">Status: All</option>
-              <option value="processing" className="bg-slate-900 text-slate-200">Processing</option>
-              <option value="needs_review" className="bg-slate-900 text-slate-200">Needs Review</option>
-              <option value="verified" className="bg-slate-900 text-slate-200">Verified</option>
-              <option value="failed" className="bg-slate-900 text-slate-200">Failed</option>
+              <option value="human_verified" className="bg-slate-900 text-emerald-400">✓ Human Verified</option>
+              <option value="verified" className="bg-slate-900 text-emerald-400">Verified</option>
+              <option value="needs_review" className="bg-slate-900 text-amber-400">Needs Review</option>
+              <option value="conflict" className="bg-slate-900 text-rose-400">⚠️ Conflict</option>
+              <option value="processing" className="bg-slate-900 text-sky-400">Processing</option>
+              <option value="failed" className="bg-slate-900 text-rose-400">Failed</option>
               <option value="draft" className="bg-slate-900 text-slate-200">Draft</option>
             </select>
           </div>

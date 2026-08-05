@@ -29,6 +29,14 @@ export function getStatusColor(status: ProductStatus): {
   label: string;
 } {
   switch (status) {
+    case 'human_verified':
+      return {
+        bg: 'bg-emerald-500/10',
+        text: 'text-emerald-300 font-bold',
+        border: 'border-emerald-500/30',
+        dot: 'bg-emerald-400',
+        label: '✓ Human Verified',
+      };
     case 'verified':
       return {
         bg: 'bg-emerald-950/60',
@@ -36,6 +44,14 @@ export function getStatusColor(status: ProductStatus): {
         border: 'border-emerald-800/60',
         dot: 'bg-emerald-500',
         label: 'Verified',
+      };
+    case 'conflict':
+      return {
+        bg: 'bg-rose-950/60',
+        text: 'text-rose-400 font-bold',
+        border: 'border-rose-800/60',
+        dot: 'bg-rose-500 animate-ping',
+        label: '⚠️ Conflict',
       };
     case 'needs_review':
       return {
