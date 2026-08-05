@@ -10,10 +10,14 @@ export interface ProductAttribute {
   value: string | null;
   unit?: string | null;
   confidence: number;
-  status?: 'verified' | 'unverified' | 'not_found' | 'missing';
+  status?: 'extracted' | 'ai_enriched' | 'needs_review' | 'verified' | 'unverified' | 'not_found' | 'missing' | string;
   source_id?: string | null;
   source_location?: string | null;
   extraction_method?: string | null;
+  source_priority?: number;
+  source_name?: string;
+  source_url?: string | null;
+  evidence_text?: string;
   verified?: boolean;
 }
 

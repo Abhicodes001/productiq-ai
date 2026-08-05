@@ -12,8 +12,16 @@ from app.schemas.rag import (
     ProductQARequest,
     ProductQAResponse,
 )
+from app.schemas.enrichment import (
+    DetectMissingResponse,
+    EnrichmentRequest,
+    EnrichmentResponse,
+    EnrichmentSummaryResponse,
+)
 from app.services.product_service import ProductService
 from app.rag.rag_service import RAGService
+from app.agents.missing_data_detector import MissingDataDetector
+from app.agents.orchestrator import ProductIntelligenceOrchestrator
 
 router = APIRouter()
 
@@ -308,6 +316,60 @@ def ask_product_question(product_id: str, qa_in: ProductQARequest):
         question=qa_in.question,
         top_k=qa_in.top_k
     )
+
+# ==========================================
+# PHASE 5: AI ENRICHMENT & MULTI-AGENT ENDPOINTS
+# ==========================================
+
+@router.post("/{product_id}/detect-missing", response_model=DetectMissingResponse)
+def detect_missing_product_attributes(product_id: str):
+    """
+    Detect missing technical specifications based on industrial domain category schemas.
+    """
+    product = ProductService.get_product_by_id(product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with ID '{product_id}' not found"
+        )
+
+    res = MissingDataDetector.detect_missing_attributes(
+        category=product.get("category", "default"),
+        existing_attributes=product.get("attributes", [])
+    )
+    return {
+        "product_id": product_id,
+        **res
+    }
+
+@router.post("/{product_id}/enrich", response_model=EnrichmentResponse)
+def enrich_missing_product_attributes(product_id: str, enrich_in: Optional[EnrichmentRequest] = None):
+    """
+    Trigger central Product Intelligence Orchestrator to execute multi-agent AI enrichment workflow across P1-P5 source tiers.
+    """
+    product = ProductService.get_product_by_id(product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with ID '{product_id}' not found"
+        )
+
+    max_p = enrich_in.max_source_priority if enrich_in else 5
+    return ProductIntelligenceOrchestrator.run_enrichment_pipeline(product_id=product_id, max_priority=max_p)
+
+@router.get("/{product_id}/enrichment-summary", response_model=EnrichmentSummaryResponse)
+def get_product_enrichment_summary(product_id: str):
+    """
+    Fetch comprehensive breakdown of extracted vs AI enriched vs missing attributes with source priority metrics.
+    """
+    product = ProductService.get_product_by_id(product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with ID '{product_id}' not found"
+        )
+
+    return ProductIntelligenceOrchestrator.get_enrichment_summary(product_id=product_id)
 
 def os_ext(filename: str) -> str:
     import os

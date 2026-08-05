@@ -30,6 +30,12 @@ import { JobStatusResponse } from '../types/product';
 import { SourcePanel } from '../components/rag/SourcePanel';
 import { ProductQAWidget } from '../components/rag/ProductQAWidget';
 import { SourceCitationBadge } from '../components/rag/SourceCitationBadge';
+import { Sparkles } from 'lucide-react';
+import { MissingDataPanel } from '../components/enrichment/MissingDataPanel';
+import { EnrichmentSummaryCard } from '../components/enrichment/EnrichmentSummaryCard';
+import { EnrichmentBadge } from '../components/enrichment/EnrichmentBadge';
+import { detectMissingAttributes, enrichProductAttributes, fetchEnrichmentSummary } from '../services/api';
+import { MissingAttributeItem, EnrichmentSummaryResponse } from '../types/enrichment';
 
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,12 +43,51 @@ export const ProductDetailPage: React.FC = () => {
   const { product, loading, error, refreshProduct } = useProductDetail(id);
 
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'specs' | 'sources' | 'validation' | 'review' | 'export'
+    'overview' | 'specs' | 'enrichment' | 'sources' | 'validation' | 'review' | 'export'
   >('overview');
 
   const [jobStatus, setJobStatus] = useState<JobStatusResponse | null>(null);
   const [isTriggering, setIsTriggering] = useState(false);
   const [isIndexing, setIsIndexing] = useState(false);
+  const [isEnriching, setIsEnriching] = useState(false);
+  const [missingSpecs, setMissingSpecs] = useState<MissingAttributeItem[]>([]);
+  const [enrichSummary, setEnrichSummary] = useState<EnrichmentSummaryResponse | null>(null);
+  const [agentLogs, setAgentLogs] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!id) return;
+    const loadEnrichmentData = async () => {
+      try {
+        const missRes = await detectMissingAttributes(id);
+        setMissingSpecs(missRes.missing_attributes || []);
+        const sumRes = await fetchEnrichmentSummary(id);
+        setEnrichSummary(sumRes);
+      } catch (err) {
+        console.error("Error loading enrichment metrics:", err);
+      }
+    };
+    loadEnrichmentData();
+  }, [id]);
+
+  const handleEnrichMissing = async () => {
+    if (!id) return;
+    setIsEnriching(true);
+    try {
+      const enrichRes = await enrichProductAttributes(id);
+      if (enrichRes && enrichRes.agent_logs) {
+        setAgentLogs(enrichRes.agent_logs);
+      }
+      await refreshProduct();
+      const missRes = await detectMissingAttributes(id);
+      setMissingSpecs(missRes.missing_attributes || []);
+      const sumRes = await fetchEnrichmentSummary(id);
+      setEnrichSummary(sumRes);
+    } catch (err) {
+      console.error("Error running AI enrichment:", err);
+    } finally {
+      setIsEnriching(false);
+    }
+  };
 
   const handleIndexVectors = async () => {
     if (!id) return;
@@ -131,6 +176,7 @@ export const ProductDetailPage: React.FC = () => {
   const tabs = [
     { key: 'overview', label: 'Overview', icon: Boxes },
     { key: 'specs', label: 'Technical Specifications', icon: Layers },
+    { key: 'enrichment', label: 'AI Enrichment & Missing Data', icon: Sparkles },
     { key: 'sources', label: 'Sources Lineage', icon: Database },
     { key: 'validation', label: 'Validation Rules', icon: ShieldCheck },
     { key: 'review', label: 'Human Review', icon: FileCheck2 },
@@ -350,16 +396,23 @@ export const ProductDetailPage: React.FC = () => {
                     <th className="px-4 py-2 font-semibold">SPECIFICATION KEY</th>
                     <th className="px-4 py-2 font-semibold">VALUE</th>
                     <th className="px-4 py-2 font-semibold">UNIT</th>
+                    <th className="px-4 py-2 font-semibold">STATUS / SOURCE TIER</th>
                     <th className="px-4 py-2 font-semibold">CONFIDENCE</th>
                     <th className="px-4 py-2 font-semibold">VERIFIED</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800 text-slate-300">
-                  {product.attributes.map((attr) => (
-                    <tr key={attr.id}>
+                  {product.attributes.map((attr: any) => (
+                    <tr key={attr.id} className="hover:bg-slate-900/40 transition-colors">
                       <td className="px-4 py-2.5 font-medium">{attr.key}</td>
-                      <td className="px-4 py-2.5 font-mono text-slate-100">{attr.value}</td>
+                      <td className="px-4 py-2.5 font-mono text-slate-100 font-bold">{attr.value}</td>
                       <td className="px-4 py-2.5 font-mono text-slate-400">{attr.unit || '—'}</td>
+                      <td className="px-4 py-2.5">
+                        <EnrichmentBadge
+                          status={attr.status || (attr.verified ? 'verified' : 'extracted')}
+                          sourcePriority={attr.source_priority || 1}
+                        />
+                      </td>
                       <td className="px-4 py-2.5 font-mono">{formatPercentage(attr.confidence)}</td>
                       <td className="px-4 py-2.5">
                         <SourceCitationBadge
@@ -381,6 +434,150 @@ export const ProductDetailPage: React.FC = () => {
                 description="Technical specifications will populate after PDF parsing and LLM table extraction execution."
               />
             )}
+          </div>
+        )}
+
+        {/* ENRICHMENT TAB */}
+        {activeTab === 'enrichment' && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-3">
+              <div>
+                <h2 className="text-xs font-bold text-slate-100 uppercase tracking-wider">
+                  Phase 5: Multi-Agent AI Attribute Enrichment & Domain Completeness
+                </h2>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Automated missing spec detection, grounded priority search across P1-P5 sources, and evidence traceability.
+                </p>
+              </div>
+              <Button
+                size="sm"
+                onClick={handleEnrichMissing}
+                disabled={isEnriching}
+                className="gap-2 bg-cyan-600 hover:bg-cyan-500 font-mono text-xs shadow-lg shadow-cyan-900/30 shrink-0"
+              >
+                <Sparkles className={`w-3.5 h-3.5 ${isEnriching ? 'animate-spin' : ''}`} />
+                <span>{isEnriching ? 'Agents Executing...' : 'Trigger Multi-Agent Enrichment'}</span>
+              </Button>
+            </div>
+
+            {/* Summary Metrics Card */}
+            {enrichSummary && <EnrichmentSummaryCard summary={enrichSummary} />}
+
+            {/* Missing Specs Domain Detector Panel */}
+            <MissingDataPanel
+              missingAttributes={missingSpecs}
+              onEnrichMissing={handleEnrichMissing}
+              isEnriching={isEnriching}
+            />
+
+            {/* AI Enriched Attributes Table */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-cyan-400" />
+                  <span>AI Enriched Technical Specifications</span>
+                </h3>
+                <span className="text-[11px] font-mono text-slate-400">
+                  {product.attributes?.filter((a: any) => a.status === 'ai_enriched').length || 0} Attributes Enriched
+                </span>
+              </div>
+
+              {product.attributes && product.attributes.filter((a: any) => a.status === 'ai_enriched').length > 0 ? (
+                <div className="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-slate-900 text-slate-400 font-mono text-[11px] border-b border-slate-800">
+                      <tr>
+                        <th className="px-4 py-2.5 font-semibold">SPECIFICATION</th>
+                        <th className="px-4 py-2.5 font-semibold">ENRICHED VALUE</th>
+                        <th className="px-4 py-2.5 font-semibold">SOURCE TIER</th>
+                        <th className="px-4 py-2.5 font-semibold">SOURCE NAME</th>
+                        <th className="px-4 py-2.5 font-semibold">EVIDENCE TEXT</th>
+                        <th className="px-4 py-2.5 font-semibold">CONFIDENCE</th>
+                        <th className="px-4 py-2.5 font-semibold">VERIFICATION</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/80 text-slate-300">
+                      {product.attributes
+                        .filter((a: any) => a.status === 'ai_enriched')
+                        .map((attr: any) => (
+                          <tr key={attr.id} className="hover:bg-slate-900/50 transition-colors">
+                            <td className="px-4 py-3 font-medium text-slate-200">{attr.key}</td>
+                            <td className="px-4 py-3 font-mono font-bold text-cyan-300">
+                              {attr.value} {attr.unit || ''}
+                            </td>
+                            <td className="px-4 py-3">
+                              <EnrichmentBadge
+                                status={attr.status}
+                                sourcePriority={attr.source_priority || 2}
+                              />
+                            </td>
+                            <td className="px-4 py-3 font-mono text-slate-400">
+                              {attr.source_url ? (
+                                <a
+                                  href={attr.source_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-sky-400 hover:underline flex items-center gap-1"
+                                >
+                                  <span className="truncate max-w-[120px]">{attr.source_name || 'Web Source'}</span>
+                                  <ExternalLink className="w-3 h-3 shrink-0" />
+                                </a>
+                              ) : (
+                                <span>{attr.source_name || 'Datasheet PDF'}</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 font-mono text-[11px] text-slate-400 max-w-xs truncate">
+                              "{attr.evidence_text || 'Matched via vector RAG document search'}"
+                            </td>
+                            <td className="px-4 py-3 font-mono font-bold text-slate-200">
+                              {formatPercentage(attr.confidence)}
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400">
+                                Unverified
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="p-8 text-center bg-slate-950/60 rounded-xl border border-slate-800 text-slate-400 text-xs font-mono">
+                  No attributes enriched yet. Click "Trigger Multi-Agent Enrichment" above to run domain gap detection and P1-P5 evidence search.
+                </div>
+              )}
+            </div>
+
+            {/* Multi-Agent Orchestrator Live Execution Trace */}
+            <div className="bg-slate-950 border border-cyan-900/40 rounded-xl p-5 space-y-3 font-mono">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                <div className="flex items-center gap-2">
+                  <Cpu className="w-4 h-4 text-cyan-400 animate-pulse" />
+                  <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">
+                    Multi-Agent Orchestrator Execution Log
+                  </h3>
+                </div>
+                <span className="text-[10px] text-cyan-400 font-semibold uppercase">
+                  {agentLogs.length > 0 ? 'Live Log Stream' : 'Ready'}
+                </span>
+              </div>
+
+              <div className="space-y-1.5 text-[11px] max-h-48 overflow-y-auto pr-2">
+                {(agentLogs.length > 0 ? agentLogs : [
+                  "Agent 1 [Extraction Agent]: Normalizing extracted product metadata",
+                  "Agent 2 [Missing Data Detector]: Analyzing industrial domain schema completeness",
+                  "Agent 5 [Enrichment Agent]: Standing by for multi-source P1-P5 evidence search",
+                  "Agent 6 [Confidence Agent]: Normalized score model active",
+                  "Agent 7 [Validation Agent]: Traceability tagging initialized"
+                ]).map((log, idx) => (
+                  <div key={idx} className="flex items-start gap-2 text-slate-300">
+                    <span className="text-cyan-500 font-bold">[{idx + 1}]</span>
+                    <span className="leading-tight">{log}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 
