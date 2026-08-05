@@ -25,8 +25,11 @@ import { StatusBadge } from '../components/common/StatusBadge';
 import { EmptyState } from '../components/common/EmptyState';
 import { Button } from '../components/ui/Button';
 import { formatDate, formatPercentage } from '../lib/utils';
-import { fetchJobStatus, startProductAnalysis } from '../services/api';
+import { fetchJobStatus, startProductAnalysis, indexProductDocuments } from '../services/api';
 import { JobStatusResponse } from '../types/product';
+import { SourcePanel } from '../components/rag/SourcePanel';
+import { ProductQAWidget } from '../components/rag/ProductQAWidget';
+import { SourceCitationBadge } from '../components/rag/SourceCitationBadge';
 
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -39,6 +42,20 @@ export const ProductDetailPage: React.FC = () => {
 
   const [jobStatus, setJobStatus] = useState<JobStatusResponse | null>(null);
   const [isTriggering, setIsTriggering] = useState(false);
+  const [isIndexing, setIsIndexing] = useState(false);
+
+  const handleIndexVectors = async () => {
+    if (!id) return;
+    setIsIndexing(true);
+    try {
+      await indexProductDocuments(id);
+      await refreshProduct();
+    } catch (err) {
+      console.error("Vector indexing error:", err);
+    } finally {
+      setIsIndexing(false);
+    }
+  };
 
   // Poll processing job status if product status is 'processing'
   useEffect(() => {
@@ -310,6 +327,12 @@ export const ProductDetailPage: React.FC = () => {
                 description="Attribute extraction, multimodal table vision parsing, and rule validation will run in subsequent pipeline phases."
               />
             )}
+
+            {/* PHASE 4: Grounded Product Q&A Widget */}
+            <ProductQAWidget
+              productId={product.id}
+              productName={product.name}
+            />
           </div>
         )}
 
@@ -339,11 +362,13 @@ export const ProductDetailPage: React.FC = () => {
                       <td className="px-4 py-2.5 font-mono text-slate-400">{attr.unit || '—'}</td>
                       <td className="px-4 py-2.5 font-mono">{formatPercentage(attr.confidence)}</td>
                       <td className="px-4 py-2.5">
-                        {attr.verified ? (
-                          <span className="text-emerald-400 text-[10px] font-mono">✓ Verified</span>
-                        ) : (
-                          <span className="text-amber-400 text-[10px] font-mono">Unverified</span>
-                        )}
+                        <SourceCitationBadge
+                          attributeName={attr.key}
+                          value={`${attr.value} ${attr.unit || ''}`.trim()}
+                          confidence={attr.confidence}
+                          verified={attr.verified}
+                          citations={[]}
+                        />
                       </td>
                     </tr>
                   ))}
@@ -362,65 +387,13 @@ export const ProductDetailPage: React.FC = () => {
         {/* SOURCES TAB */}
         {activeTab === 'sources' && (
           <div className="space-y-4">
-            <h2 className="text-xs font-bold text-slate-100 uppercase tracking-wider border-b border-slate-800/80 pb-2">
-              Source Citation & Multi-Modal Data Lineage
-            </h2>
-
-            {(product.sources && product.sources.length > 0) || (product.documents && product.documents.length > 0) ? (
-              <div className="space-y-3">
-                <div className="grid grid-cols-1 gap-3">
-                  {product.sources?.map((src) => (
-                    <div key={src.id} className="bg-slate-950 p-4 rounded-lg border border-slate-800 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded bg-slate-900 border border-slate-800 text-sky-400">
-                          {src.source_type === 'website' ? (
-                            <Globe className="w-4 h-4 text-sky-400" />
-                          ) : src.source_type === 'pdf' ? (
-                            <FileText className="w-4 h-4 text-emerald-400" />
-                          ) : (
-                            <ImageIcon className="w-4 h-4 text-indigo-400" />
-                          )}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-slate-200">{src.source_name}</span>
-                            <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800 text-slate-400">
-                              {src.source_type}
-                            </span>
-                          </div>
-                          {src.source_url && (
-                            <p className="text-[11px] font-mono text-slate-400 mt-0.5 truncate max-w-md">{src.source_url}</p>
-                          )}
-                          {src.storage_path && (
-                            <p className="text-[11px] font-mono text-slate-500 mt-0.5">{src.storage_path}</p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-4 text-right">
-                        <div>
-                          <span className="text-[10px] font-mono text-slate-500 block">Reliability</span>
-                          <span className="text-xs font-mono font-bold text-sky-400">
-                            {formatPercentage(src.reliability_score || 0.95)}
-                          </span>
-                        </div>
-                        <span className={`text-[10px] font-mono px-2 py-1 rounded ${
-                          src.status === 'processed' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'
-                        }`}>
-                          {src.status}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <EmptyState
-                icon={Database}
-                title="No Data Sources Attached"
-                description="Attach website URLs, PDF technical datasheets, or nameplate image scans to enable automated spec extraction."
-              />
-            )}
+            <SourcePanel
+              productId={product.id}
+              sources={product.sources || []}
+              documents={product.documents || []}
+              onIndexSources={handleIndexVectors}
+              isIndexing={isIndexing}
+            />
           </div>
         )}
 

@@ -3,7 +3,17 @@ from typing import List, Optional
 from app.schemas.product import ProductCreate, ProductUpdate, ProductDetailResponse
 from app.schemas.source import SourceCreate, SourceResponse, DocumentResponse
 from app.schemas.job import JobResponse, JobStatusResponse
+from app.schemas.rag import (
+    IndexProductResponse,
+    VectorSearchRequest,
+    VectorSearchResponse,
+    VerifyAttributeRequest,
+    VerifyAttributeResponse,
+    ProductQARequest,
+    ProductQAResponse,
+)
 from app.services.product_service import ProductService
+from app.rag.rag_service import RAGService
 
 router = APIRouter()
 
@@ -209,6 +219,95 @@ def get_product_job_status(product_id: str):
             detail=f"No processing job found for product '{product_id}'"
         )
     return status_info
+
+# ==========================================
+# PHASE 4: RAG, VECTOR SEARCH & CITATION ENDPOINTS
+# ==========================================
+
+@router.post("/{product_id}/index", response_model=IndexProductResponse)
+def index_product_documents(product_id: str):
+    """
+    Build vector database index for product document and website content chunks.
+    """
+    product = ProductService.get_product_by_id(product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with ID '{product_id}' not found"
+        )
+    return RAGService.index_product_documents(product_id)
+
+@router.post("/{product_id}/search", response_model=VectorSearchResponse)
+def search_product_vector_db(product_id: str, search_in: VectorSearchRequest):
+    """
+    Perform semantic similarity search over chunks filtered strictly by product_id.
+    """
+    product = ProductService.get_product_by_id(product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with ID '{product_id}' not found"
+        )
+    
+    results = RAGService.search_vector_db(
+        product_id=product_id,
+        query=search_in.query,
+        top_k=search_in.top_k,
+        min_score=search_in.min_score
+    )
+
+    chunks = [
+        {
+            "chunk_id": r["chunk_id"],
+            "text": r["text"],
+            "similarity_score": r["similarity_score"],
+            "metadata": r["metadata"]
+        }
+        for r in results
+    ]
+
+    return {
+        "product_id": product_id,
+        "query": search_in.query,
+        "results_count": len(chunks),
+        "chunks": chunks
+    }
+
+@router.post("/{product_id}/verify", response_model=VerifyAttributeResponse)
+def verify_product_attribute(product_id: str, verify_in: VerifyAttributeRequest):
+    """
+    Verify an extracted product attribute against RAG vector sources.
+    """
+    product = ProductService.get_product_by_id(product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with ID '{product_id}' not found"
+        )
+    
+    return RAGService.verify_attribute(
+        product_id=product_id,
+        attribute_name=verify_in.attribute_name,
+        current_value=verify_in.current_value
+    )
+
+@router.post("/{product_id}/ask", response_model=ProductQAResponse)
+def ask_product_question(product_id: str, qa_in: ProductQARequest):
+    """
+    Product Q&A returning grounded LLM answer strictly using RAG retrieved context with citations.
+    """
+    product = ProductService.get_product_by_id(product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product with ID '{product_id}' not found"
+        )
+    
+    return RAGService.ask_product_question(
+        product_id=product_id,
+        question=qa_in.question,
+        top_k=qa_in.top_k
+    )
 
 def os_ext(filename: str) -> str:
     import os
