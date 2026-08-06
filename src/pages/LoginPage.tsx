@@ -11,6 +11,7 @@ export const LoginPage: React.FC = () => {
 
   const [email, setEmail] = useState('alex.engineer@industrial-solutions.com');
   const [password, setPassword] = useState('demo123456');
+  const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,6 +62,25 @@ export const LoginPage: React.FC = () => {
         placeholder="••••••••"
         required
       />
+
+      <div className="flex items-center justify-between text-xs pt-1">
+        <label className="flex items-center gap-2 text-slate-300 cursor-pointer select-none hover:text-slate-100 transition-colors">
+          <input
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+            className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-sky-500 focus:ring-sky-500/40 focus:ring-offset-slate-950 cursor-pointer accent-sky-500"
+          />
+          <span>Remember me</span>
+        </label>
+        <button
+          type="button"
+          onClick={() => alert('Password reset instructions have been sent to your email.')}
+          className="text-slate-400 hover:text-sky-400 transition-colors text-xs"
+        >
+          Forgot password?
+        </button>
+      </div>
 
       <div className="pt-2">
         <Button type="submit" className="w-full gap-2" disabled={loading}>
