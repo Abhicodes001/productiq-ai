@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query, UploadFile, File, Form, status
+from fastapi import APIRouter, HTTPException, Query, UploadFile, File, Form, status, Response
 from typing import List, Optional
 from app.schemas.product import ProductCreate, ProductUpdate, ProductDetailResponse
 from app.schemas.source import SourceCreate, SourceResponse, DocumentResponse
@@ -29,6 +29,9 @@ from app.rag.rag_service import RAGService
 from app.agents.missing_data_detector import MissingDataDetector
 from app.agents.orchestrator import ProductIntelligenceOrchestrator
 from app.validation.validator import ValidationEngine
+from app.services.knowledge_graph import KnowledgeGraphService
+from app.services.commerce_readiness import CommerceReadinessEngine
+from app.services.export_service import ExportService
 
 router = APIRouter()
 
@@ -422,6 +425,48 @@ def get_global_review_queue():
     Fetch active global review queue across all products.
     """
     return ValidationEngine.get_global_review_queue()
+
+# ==========================================
+# PHASE 7: COMMERCE-READY OUTPUT, EXPORT & KNOWLEDGE GRAPH ENDPOINTS
+# ==========================================
+
+@router.get("/{product_id}/knowledge-graph")
+def get_product_knowledge_graph(product_id: str):
+    """
+    Fetch structured entity node and semantic edge graph for a product.
+    """
+    return KnowledgeGraphService.get_product_knowledge_graph(product_id)
+
+@router.get("/{product_id}/commerce-readiness")
+def evaluate_commerce_readiness(product_id: str):
+    """
+    Compute 6-factor commerce-readiness score and audit breakdown.
+    """
+    return CommerceReadinessEngine.evaluate_commerce_readiness(product_id)
+
+@router.post("/{product_id}/mark-commerce-ready")
+def mark_product_commerce_ready(product_id: str):
+    """
+    Update product status lifecycle state to 'commerce_ready'.
+    """
+    return CommerceReadinessEngine.mark_as_commerce_ready(product_id)
+
+@router.get("/{product_id}/export/json")
+def export_product_json(product_id: str):
+    """
+    Generate complete commerce-ready structured product JSON payload.
+    """
+    return ExportService.generate_commerce_ready_json(product_id)
+
+@router.get("/{product_id}/export/csv")
+def export_product_csv(product_id: str):
+    """
+    Export flattened CSV string representation of product intelligence.
+    """
+    csv_data = ExportService.generate_flattened_csv([product_id])
+    return Response(content=csv_data, media_type="text/csv", headers={
+        "Content-Disposition": f"attachment; filename=product_{product_id}_export.csv"
+    })
 
 def os_ext(filename: str) -> str:
     import os

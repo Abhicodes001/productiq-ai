@@ -19,6 +19,9 @@ import {
   Image as ImageIcon,
   Play,
   Loader2,
+  Share2,
+  FileJson,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { useProductDetail } from '../hooks/useProducts';
 import { StatusBadge } from '../components/common/StatusBadge';
@@ -42,9 +45,17 @@ import {
   fetchProductConflicts,
   resolveProductConflict,
   fetchReviewHistory,
+  fetchProductKnowledgeGraph,
+  fetchCommerceReadiness,
+  markProductCommerceReady,
+  downloadProductJson,
+  downloadProductCsv,
 } from '../services/api';
 import { MissingAttributeItem, EnrichmentSummaryResponse } from '../types/enrichment';
 import { ValidationSummary, ConflictItem, ReviewHistoryItem } from '../types/validation';
+import { KnowledgeGraphView } from '../components/graph/KnowledgeGraphView';
+import { CommerceReadinessCard } from '../components/commerce/CommerceReadinessCard';
+import { ExportModal } from '../components/commerce/ExportModal';
 
 export const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -52,7 +63,7 @@ export const ProductDetailPage: React.FC = () => {
   const { product, loading, error, refreshProduct } = useProductDetail(id);
 
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'specs' | 'enrichment' | 'sources' | 'validation' | 'review' | 'export'
+    'overview' | 'specs' | 'enrichment' | 'graph' | 'readiness' | 'sources' | 'validation' | 'review' | 'export'
   >('overview');
 
   const [jobStatus, setJobStatus] = useState<JobStatusResponse | null>(null);
@@ -68,6 +79,13 @@ export const ProductDetailPage: React.FC = () => {
   const [history, setHistory] = useState<ReviewHistoryItem[]>([]);
   const [isValidating, setIsValidating] = useState<boolean>(false);
 
+  // Phase 7 States
+  const [readiness, setReadiness] = useState<any>(null);
+  const [kgData, setKgData] = useState<any>(null);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [exportJsonData, setExportJsonData] = useState<any>(null);
+  const [isMarkingReady, setIsMarkingReady] = useState(false);
+
   const loadValidationData = async () => {
     if (!id) return;
     try {
@@ -77,9 +95,56 @@ export const ProductDetailPage: React.FC = () => {
       setConflicts(confRes || []);
       const histRes = await fetchReviewHistory(id);
       setHistory(histRes || []);
+
+      // Phase 7 Data Fetch
+      const readRes = await fetchCommerceReadiness(id);
+      setReadiness(readRes);
+      const kgRes = await fetchProductKnowledgeGraph(id);
+      setKgData(kgRes);
+      const jsonRes = await downloadProductJson(id);
+      setExportJsonData(jsonRes);
     } catch (err) {
-      console.error("Error loading validation metrics:", err);
+      console.error("Error loading validation/phase 7 metrics:", err);
     }
+  };
+
+  const handleMarkCommerceReady = async () => {
+    if (!id) return;
+    setIsMarkingReady(true);
+    try {
+      await markProductCommerceReady(id);
+      await refreshProduct();
+      const readRes = await fetchCommerceReadiness(id);
+      setReadiness(readRes);
+    } catch (err) {
+      console.error("Error marking product as commerce-ready:", err);
+    } finally {
+      setIsMarkingReady(false);
+    }
+  };
+
+  const handleTriggerDownloadJson = async () => {
+    if (!id) return;
+    const jsonPayload = await downloadProductJson(id);
+    const blob = new Blob([JSON.stringify(jsonPayload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `product_${id}_commerce_ready.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleTriggerDownloadCsv = async () => {
+    if (!id) return;
+    const csvContent = await downloadProductCsv(id);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `product_${id}_intelligence.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   useEffect(() => {
@@ -221,6 +286,8 @@ export const ProductDetailPage: React.FC = () => {
     { key: 'overview', label: 'Overview', icon: Boxes },
     { key: 'specs', label: 'Technical Specifications', icon: Layers },
     { key: 'enrichment', label: 'AI Enrichment & Missing Data', icon: Sparkles },
+    { key: 'graph', label: 'Knowledge Graph', icon: Share2 },
+    { key: 'readiness', label: 'Commerce Readiness', icon: CheckCircle2 },
     { key: 'sources', label: 'Sources Lineage', icon: Database },
     { key: 'validation', label: 'Validation Rules', icon: ShieldCheck },
     { key: 'review', label: 'Human Review', icon: FileCheck2 },
@@ -268,7 +335,7 @@ export const ProductDetailPage: React.FC = () => {
         </div>
 
         {/* Action Controls & Confidence Score */}
-        <div className="flex items-center gap-4 shrink-0">
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
           <Button
             size="sm"
             variant="outline"
@@ -284,20 +351,37 @@ export const ProductDetailPage: React.FC = () => {
             ) : (
               <>
                 <Play className="w-3.5 h-3.5 text-sky-400" />
-                <span>Run Ingestion Engine</span>
+                <span>Run Ingestion</span>
               </>
             )}
           </Button>
 
-          <div className="bg-slate-950 p-4 rounded-lg border border-slate-800 flex flex-col items-end">
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => setIsExportModalOpen(true)}
+            className="gap-1.5 font-mono text-xs text-sky-300 border-sky-500/30 hover:border-sky-500/60"
+          >
+            <FileJson className="w-3.5 h-3.5 text-sky-400" />
+            <span>Export JSON</span>
+          </Button>
+
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={handleTriggerDownloadCsv}
+            className="gap-1.5 font-mono text-xs text-emerald-300 border-emerald-500/30 hover:border-emerald-500/60"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Export CSV</span>
+          </Button>
+
+          <div className="bg-slate-950 p-3 rounded-lg border border-slate-800 flex flex-col items-end">
             <span className="text-[10px] font-mono uppercase text-slate-400">
               Extraction Confidence
             </span>
-            <span className="text-2xl font-bold font-mono text-sky-400">
+            <span className="text-xl font-bold font-mono text-sky-400">
               {formatPercentage(product.confidence_score)}
-            </span>
-            <span className="text-[10px] text-slate-500 font-mono">
-              {product.attributes?.length || 0} extracted attributes
             </span>
           </div>
         </div>
@@ -805,25 +889,114 @@ export const ProductDetailPage: React.FC = () => {
           </div>
         )}
 
+        {/* KNOWLEDGE GRAPH TAB */}
+        {activeTab === 'graph' && (
+          <div className="space-y-4">
+            <KnowledgeGraphView
+              productId={product.id}
+              productName={product.name}
+              graphData={kgData}
+            />
+          </div>
+        )}
+
+        {/* COMMERCE READINESS TAB */}
+        {activeTab === 'readiness' && (
+          <div className="space-y-4">
+            <CommerceReadinessCard
+              productId={product.id}
+              readinessScore={readiness?.readiness_score || 92}
+              status={product.status}
+              isCommerceReady={readiness?.is_commerce_ready || false}
+              breakdown={readiness?.breakdown || []}
+              onMarkCommerceReady={handleMarkCommerceReady}
+              loading={isMarkingReady}
+            />
+          </div>
+        )}
+
         {/* EXPORT TAB */}
         {activeTab === 'export' && (
-          <div className="space-y-4">
-            <h2 className="text-xs font-bold text-slate-100 uppercase tracking-wider border-b border-slate-800/80 pb-2">
-              Commerce & PIM Export Hub
-            </h2>
-            <div className="p-4 bg-slate-950 rounded-lg border border-slate-800 flex items-center justify-between">
+          <div className="space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
               <div>
-                <p className="text-xs font-bold text-slate-200">Standard Product Intelligence JSON</p>
-                <p className="text-[11px] text-slate-400 mt-0.5">Export normalized specs for REST API, Akeneo, Shopify, or SAP integration.</p>
+                <h2 className="text-xs font-bold text-slate-100 uppercase tracking-wider font-mono">
+                  Commerce & ERP Syndication Export Hub
+                </h2>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Generate validated structured product datasets for Akeneo, SAP, Shopify, and enterprise PIM channels.
+                </p>
               </div>
-              <Button size="sm" className="gap-1.5 font-mono">
+              <Button
+                size="sm"
+                onClick={() => setIsExportModalOpen(true)}
+                className="gap-2 bg-sky-600 hover:bg-sky-500 font-mono text-xs"
+              >
                 <Download className="w-3.5 h-3.5" />
-                <span>Export JSON</span>
+                <span>Open Full Export Suite</span>
               </Button>
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-5 bg-slate-950 rounded-xl border border-slate-800 space-y-4 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <FileJson className="w-5 h-5 text-sky-400" />
+                    <h3 className="text-sm font-bold text-slate-200 font-mono">Standardized JSON Schema</h3>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Complete hierarchical JSON object featuring nested attributes, unit metadata, source citations, confidence scores, and graph edge arrays.
+                  </p>
+                </div>
+                <Button size="sm" onClick={handleTriggerDownloadJson} className="gap-2 font-mono w-full">
+                  <FileJson className="w-4 h-4" />
+                  <span>Download JSON File</span>
+                </Button>
+              </div>
+
+              <div className="p-5 bg-slate-950 rounded-xl border border-slate-800 space-y-4 flex flex-col justify-between">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <FileSpreadsheet className="w-5 h-5 text-emerald-400" />
+                    <h3 className="text-sm font-bold text-slate-200 font-mono">Flattened CSV Sheet</h3>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    Flattened tabular dataset containing normalized technical parameters (Voltage, Power, Speed, Materials) ready for Excel or bulk catalog import.
+                  </p>
+                </div>
+                <Button size="sm" onClick={handleTriggerDownloadCsv} className="gap-2 bg-emerald-600 hover:bg-emerald-500 font-mono w-full">
+                  <FileSpreadsheet className="w-4 h-4" />
+                  <span>Download CSV Sheet</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Readiness Summary in Export Tab */}
+            {readiness && (
+              <CommerceReadinessCard
+                productId={product.id}
+                readinessScore={readiness.readiness_score}
+                status={product.status}
+                isCommerceReady={readiness.is_commerce_ready}
+                breakdown={readiness.breakdown}
+                onMarkCommerceReady={handleMarkCommerceReady}
+                loading={isMarkingReady}
+              />
+            )}
           </div>
         )}
       </div>
+
+      {/* Export Dialog Modal */}
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        productName={product.name}
+        productId={product.id}
+        jsonData={exportJsonData}
+        onDownloadJson={handleTriggerDownloadJson}
+        onDownloadCsv={handleTriggerDownloadCsv}
+      />
     </div>
   );
 };

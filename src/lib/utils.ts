@@ -29,6 +29,14 @@ export function getStatusColor(status: ProductStatus): {
   label: string;
 } {
   switch (status) {
+    case 'commerce_ready':
+      return {
+        bg: 'bg-emerald-500/20',
+        text: 'text-emerald-300 font-bold',
+        border: 'border-emerald-500/50 shadow-emerald-500/10',
+        dot: 'bg-emerald-400',
+        label: '✨ Commerce Ready',
+      };
     case 'human_verified':
       return {
         bg: 'bg-emerald-500/10',

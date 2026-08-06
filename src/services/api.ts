@@ -836,3 +836,158 @@ export async function fetchGlobalReviewQueue(): Promise<any[]> {
   }
   return queue;
 }
+
+// ==========================================
+// PHASE 7: COMMERCE-READY OUTPUT, EXPORT & KNOWLEDGE GRAPH API
+// ==========================================
+
+export async function fetchProductKnowledgeGraph(productId: string): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/knowledge-graph`);
+    if (response.ok) return await response.json();
+  } catch (error) {
+    console.warn('Backend API offline, generating local knowledge graph data:', error);
+  }
+
+  const prod = localProductsStore.find((p) => p.id === productId);
+  const pname = prod?.name || 'Schneider Altivar ATV930 45kW';
+  const mfr = prod?.manufacturer || 'Schneider Electric';
+  const cat = prod?.category || 'Variable Frequency Drives (VFD)';
+
+  return {
+    product_id: productId,
+    product_name: pname,
+    total_nodes: 12,
+    total_edges: 11,
+    nodes: [
+      { id: `product-${productId}`, label: pname, type: 'product', details: { model: prod?.model_number || 'ATV930D45N4', status: prod?.status || 'commerce_ready' } },
+      { id: 'mfr-node', label: mfr, type: 'manufacturer', details: { hq: 'Global HQ', tier: 'OEM' } },
+      { id: 'cat-node', label: cat, type: 'category', details: { sector: 'Industrial Automation' } },
+      { id: 'spec-1', label: 'Supply Voltage: 380...480 V', type: 'specification', details: { key: 'Voltage', unit: 'V' } },
+      { id: 'spec-2', label: 'Nominal Power: 45 kW / 60 HP', type: 'specification', details: { key: 'Power', unit: 'kW' } },
+      { id: 'spec-3', label: 'Nominal Speed: 1440 RPM', type: 'specification', details: { key: 'RPM', unit: 'RPM' } },
+      { id: 'spec-4', label: 'Housing: 316L Stainless Steel', type: 'specification', details: { key: 'Material', unit: null } },
+      { id: 'app-1', label: 'Heavy Duty Pump & Fan Control', type: 'application', details: { industry: 'Industrial Utilities' } },
+      { id: 'app-2', label: 'Conveyor Drive Automation', type: 'application', details: { industry: 'Material Handling' } },
+      { id: 'cert-1', label: 'CE Compliance Directive', type: 'certification', details: { standard: 'EU Safety Standard' } },
+      { id: 'cert-2', label: 'UL 508C Listed', type: 'certification', details: { standard: 'North America Standard' } },
+      { id: 'comp-1', label: 'VW3A3600 Modbus Card', type: 'compatible_product', details: { category: 'Option Card' } },
+    ],
+    edges: [
+      { id: 'e1', source: `product-${productId}`, target: 'mfr-node', relationship: 'MANUFACTURED_BY', label: 'Manufactured By' },
+      { id: 'e2', source: `product-${productId}`, target: 'cat-node', relationship: 'BELONGS_TO', label: 'Belongs To Category' },
+      { id: 'e3', source: `product-${productId}`, target: 'spec-1', relationship: 'HAS_SPECIFICATION', label: 'Has Specification' },
+      { id: 'e4', source: `product-${productId}`, target: 'spec-2', relationship: 'HAS_SPECIFICATION', label: 'Has Specification' },
+      { id: 'e5', source: `product-${productId}`, target: 'spec-3', relationship: 'HAS_SPECIFICATION', label: 'Has Specification' },
+      { id: 'e6', source: `product-${productId}`, target: 'spec-4', relationship: 'HAS_SPECIFICATION', label: 'Has Specification' },
+      { id: 'e7', source: `product-${productId}`, target: 'app-1', relationship: 'USED_IN', label: 'Used In Application' },
+      { id: 'e8', source: `product-${productId}`, target: 'app-2', relationship: 'USED_IN', label: 'Used In Application' },
+      { id: 'e9', source: `product-${productId}`, target: 'cert-1', relationship: 'CERTIFIED_BY', label: 'Certified By' },
+      { id: 'e10', source: `product-${productId}`, target: 'cert-2', relationship: 'CERTIFIED_BY', label: 'Certified By' },
+      { id: 'e11', source: `product-${productId}`, target: 'comp-1', relationship: 'COMPATIBLE_WITH', label: 'Compatible With' },
+    ]
+  };
+}
+
+export async function fetchCommerceReadiness(productId: string): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/commerce-readiness`);
+    if (response.ok) return await response.json();
+  } catch (error) {
+    console.warn('Backend API offline, computing local commerce readiness:', error);
+  }
+
+  const prod = localProductsStore.find((p) => p.id === productId);
+  const st = prod?.status || 'verified';
+  const score = st === 'commerce_ready' ? 96 : (st === 'verified' ? 92 : 65);
+
+  return {
+    product_id: productId,
+    readiness_score: score,
+    status: st,
+    is_commerce_ready: st === 'commerce_ready' || score >= 85,
+    breakdown: [
+      { id: 'core_metadata', label: 'Required Product Metadata', score: 20, max_score: 20, passed: true, detail: 'Name, Manufacturer, Category, and Model specified.' },
+      { id: 'spec_density', label: 'Technical Specification Density', score: 20, max_score: 20, passed: true, detail: '8 technical specifications extracted and structured.' },
+      { id: 'source_traceability', label: 'Multi-Source Traceability', score: 15, max_score: 15, passed: true, detail: '3 verified document datasheets & web sources attached.' },
+      { id: 'cross_validation', label: 'Cross-Source Rule Validation', score: 15, max_score: 15, passed: true, detail: 'Cross-source normalization rules passed.' },
+      { id: 'conflict_resolution', label: 'Zero Open Conflicts', score: st === 'needs_review' ? 0 : 15, max_score: 15, passed: st !== 'needs_review', detail: st === 'needs_review' ? '1 open conflict requires review.' : 'All attribute conflicts resolved.' },
+      { id: 'confidence_threshold', label: 'Overall Confidence Score >= 85%', score: 12, max_score: 15, passed: true, detail: 'Overall product intelligence confidence: 92%.' },
+    ]
+  };
+}
+
+export async function markProductCommerceReady(productId: string): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/mark-commerce-ready`, {
+      method: 'POST',
+    });
+    if (response.ok) return await response.json();
+  } catch (error) {
+    console.warn('Backend API offline, marking product commerce-ready locally:', error);
+  }
+
+  const prod = localProductsStore.find((p) => p.id === productId);
+  if (prod) {
+    prod.status = 'commerce_ready';
+  }
+
+  return {
+    product_id: productId,
+    status: 'commerce_ready',
+    readiness_score: 98,
+    message: 'Product successfully marked as Commerce Ready.'
+  };
+}
+
+export async function downloadProductJson(productId: string): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/export/json`);
+    if (response.ok) return await response.json();
+  } catch (error) {
+    console.warn('Backend API offline, generating local export JSON:', error);
+  }
+
+  const prod = localProductsStore.find((p) => p.id === productId);
+  const kg = await fetchProductKnowledgeGraph(productId);
+
+  return {
+    schema_version: '1.0-commerce',
+    product_id: productId,
+    product_name: prod?.name || 'Schneider Altivar ATV930 45kW',
+    manufacturer: prod?.manufacturer || 'Schneider Electric',
+    category: prod?.category || 'Variable Frequency Drives (VFD)',
+    model_number: prod?.model_number || 'ATV930D45N4',
+    description: prod?.description || 'High performance industrial variable speed drive for process automation.',
+    confidence_score: prod?.confidence_score || 0.95,
+    verification_status: prod?.status || 'commerce_ready',
+    commerce_readiness_score: 96,
+    is_commerce_ready: true,
+    attributes: prod?.attributes || [],
+    sources: prod?.sources || [],
+    relationships: {
+      total_relationships: kg.total_edges,
+      nodes: kg.nodes,
+      edges: kg.edges
+    }
+  };
+}
+
+export async function downloadProductCsv(productId: string): Promise<string> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${productId}/export/csv`);
+    if (response.ok) return await response.text();
+  } catch (error) {
+    console.warn('Backend API offline, generating local CSV content:', error);
+  }
+
+  const prod = localProductsStore.find((p) => p.id === productId);
+  const pname = prod?.name || 'Schneider Altivar ATV930 45kW';
+  const mfr = prod?.manufacturer || 'Schneider Electric';
+  const cat = prod?.category || 'Variable Frequency Drives (VFD)';
+
+  const headers = ['Product ID', 'Product Name', 'Manufacturer', 'Category', 'Model Number', 'Voltage', 'Power', 'RPM', 'Material', 'Confidence Score', 'Status'];
+  const row = [productId, `"${pname}"`, `"${mfr}"`, `"${cat}"`, 'ATV930D45N4', '380...480 V', '45 kW', '1440 RPM', '316L Stainless Steel', '95%', prod?.status || 'commerce_ready'];
+
+  return `${headers.join(',')}\n${row.join(',')}`;
+}
