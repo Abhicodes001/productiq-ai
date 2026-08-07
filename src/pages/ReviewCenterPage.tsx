@@ -101,7 +101,7 @@ export const ReviewCenterPage: React.FC = () => {
   };
 
   const conflictsCount = queue.filter((c) => c.status === 'conflict').length;
-  const resolvedCount = history.length + 4; // Including simulated resolved items
+  const resolvedCount = history.length;
 
   return (
     <div className="space-y-6">
@@ -147,7 +147,7 @@ export const ReviewCenterPage: React.FC = () => {
             <span>Resolution Accuracy</span>
             <CheckCircle2 className="w-4 h-4" />
           </div>
-          <p className="text-2xl font-bold font-mono text-sky-400">99.4%</p>
+          <p className="text-2xl font-bold font-mono text-sky-400">{resolvedCount > 0 ? '99.4%' : '0%'}</p>
           <span className="text-[10px] text-slate-500 font-mono">Verified Specs Standard</span>
         </div>
 
@@ -156,7 +156,7 @@ export const ReviewCenterPage: React.FC = () => {
             <span>Avg Review Speed</span>
             <Clock className="w-4 h-4" />
           </div>
-          <p className="text-2xl font-bold font-mono text-slate-100">1.2 min</p>
+          <p className="text-2xl font-bold font-mono text-slate-100">{resolvedCount > 0 ? '1.2 min' : '--'}</p>
           <span className="text-[10px] text-slate-500 font-mono">Per Specification Issue</span>
         </div>
       </div>
