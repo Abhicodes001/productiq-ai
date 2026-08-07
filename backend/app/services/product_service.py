@@ -98,50 +98,6 @@ MOCK_PRODUCTS_DB: Dict[str, dict] = {
         ],
         "sources_count": 3,
         "conflicts_count": 1,
-    },
-    "11111111-1111-1111-1111-111111111111": {
-        "id": "11111111-1111-1111-1111-111111111111",
-        "name": "Siemens SIMATIC S7-1500 CPU 1516-3 PN/DP",
-        "manufacturer": "Siemens AG",
-        "category": "Programmable Logic Controllers",
-        "model_number": "6ES7516-3AN02-0AB0",
-        "description": "High performance CPU with large program and data memory for demanding industrial automation applications.",
-        "product_url": "https://mall.industry.siemens.com/product?id=6ES7516-3AN02-0AB0",
-        "status": "verified",
-        "confidence_score": 0.98,
-        "created_at": datetime.now(timezone.utc),
-        "updated_at": datetime.now(timezone.utc),
-        "attributes": [
-            {"id": str(uuid.uuid4()), "key": "Work Memory (Program)", "value": "1 MB", "unit": "MB", "confidence": 1.0, "verified": True},
-            {"id": str(uuid.uuid4()), "key": "Work Memory (Data)", "value": "5 MB", "unit": "MB", "confidence": 0.99, "verified": True},
-        ],
-        "sources": [
-            {
-                "id": str(uuid.uuid4()),
-                "product_id": "11111111-1111-1111-1111-111111111111",
-                "source_type": "website",
-                "source_name": "Siemens Industry Mall Catalog",
-                "source_url": "https://mall.industry.siemens.com/product?id=6ES7516-3AN02-0AB0",
-                "storage_path": None,
-                "status": "processed",
-                "reliability_score": 0.99,
-                "created_at": datetime.now(timezone.utc),
-            }
-        ],
-        "documents": [
-            {
-                "id": str(uuid.uuid4()),
-                "product_id": "11111111-1111-1111-1111-111111111111",
-                "file_name": "SIMATIC_S7_1500_Manual_EN.pdf",
-                "file_type": "application/pdf",
-                "file_path": "/storage/documents/SIMATIC_S7_1500_Manual_EN.pdf",
-                "file_size": 4200150,
-                "upload_status": "uploaded",
-                "created_at": datetime.now(timezone.utc),
-            }
-        ],
-        "sources_count": 2,
-        "conflicts_count": 0,
     }
 }
 

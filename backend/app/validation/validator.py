@@ -43,41 +43,6 @@ MOCK_CONFLICTS_STORE: Dict[str, List[Dict[str, Any]]] = {
             ],
             "created_at": datetime.now().isoformat()
         }
-    ],
-    "22222222-2222-2222-2222-222222222222": [
-        {
-            "id": "conf-1",
-            "product_id": "22222222-2222-2222-2222-222222222222",
-            "attribute_name": "Input Supply Voltage",
-            "key": "Supply Voltage",
-            "current_value": "380...480 V",
-            "status": "conflict",
-            "candidates": [
-                {
-                    "candidate_id": "cand-1",
-                    "value": "380...480 V",
-                    "unit": "V",
-                    "source_name": "ATV930 Datasheet.pdf",
-                    "source_type": "pdf",
-                    "source_url": None,
-                    "page_number": 3,
-                    "confidence": 0.88,
-                    "evidence_text": "Rated supply voltage: 3-phase 380V to 480V AC 50/60Hz."
-                },
-                {
-                    "candidate_id": "cand-2",
-                    "value": "400 V AC",
-                    "unit": "V",
-                    "source_name": "Official Website Catalog",
-                    "source_type": "website",
-                    "source_url": "https://www.se.com/ww/en/product/ATV930D45N4",
-                    "page_number": None,
-                    "confidence": 0.94,
-                    "evidence_text": "Nominal operational rating: 400 V 3-Phase."
-                }
-            ],
-            "created_at": datetime.now().isoformat()
-        }
     ]
 }
 
