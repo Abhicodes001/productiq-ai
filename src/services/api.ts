@@ -4,6 +4,37 @@ const API_BASE_URL = '/api';
 
 export const mockProducts: Product[] = [
   {
+    id: '77777777-7777-7777-7777-777777777777',
+    name: 'Flowserve Durco Mark 3 ISO Industrial Centrifugal Pump',
+    manufacturer: 'Flowserve Corporation',
+    category: 'Industrial Centrifugal Pumps',
+    model_number: 'Mark 3 ISO 50-32-200',
+    description: 'Heavy-duty end-suction chemical process centrifugal pump conforming strictly to ISO 2858 and ISO 5199 hydraulic & dimensional standards.',
+    product_url: 'https://www.flowserve.com/en/products/pumps/durco-mark-3-iso',
+    image_url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?q=80&w=800&auto=format&fit=crop',
+    status: 'needs_review',
+    confidence_score: 0.84,
+    created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
+    updated_at: new Date().toISOString(),
+    sources_count: 3,
+    conflicts_count: 1,
+    attributes: [
+      { id: 'p1', key: 'Rated Flow Rate', value: '140', unit: 'm³/h', confidence: 0.96, verified: true, source: 'PDF Datasheet p.4' },
+      { id: 'p2', key: 'Total Dynamic Head', value: '65', unit: 'm', confidence: 0.94, verified: true, source: 'PDF Datasheet p.4' },
+      { id: 'p3', key: 'Motor Power Rating', value: '30', unit: 'kW', confidence: 0.98, verified: true, source: 'Web Specification' },
+      { id: 'p4', key: 'Nominal Impeller Diameter', value: '200', unit: 'mm', confidence: 0.92, verified: true, source: 'Vision OCR Nameplate' },
+      { id: 'p5', key: 'Max Operating Temperature', value: '180', unit: '°C', confidence: 0.72, verified: false, source: 'Discrepancy (PDF: 180°C / Web: 210°C)' },
+      { id: 'p6', key: 'Casing Material', value: 'Duplex Stainless Steel 2205', confidence: 0.95, verified: true, source: 'PDF Datasheet p.6' },
+      { id: 'p7', key: 'Inlet Suction Flange', value: '50', unit: 'mm', confidence: 0.99, verified: true, source: 'ISO 2858 Specs' },
+      { id: 'p8', key: 'Outlet Discharge Flange', value: '32', unit: 'mm', confidence: 0.99, verified: true, source: 'ISO 2858 Specs' },
+      { id: 'p9', key: 'ECCN Classification Code', value: '2B350.i', confidence: 0.98, verified: true, source: 'AI Enrichment (Export Compliance)' },
+      { id: 'p10', key: 'Harmonized System (HS) Code', value: '8413.70.20', confidence: 0.97, verified: true, source: 'AI Enrichment (Taxonomy Agent)' },
+      { id: 'p11', key: 'Ingress Protection Rating', value: 'IP66', confidence: 0.93, verified: true, source: 'AI Enrichment (Domain Schema)' },
+      { id: 'p12', key: 'Regulatory Standard', value: 'ISO 2858 / ISO 5199 / ATEX Zone 1', confidence: 0.99, verified: true, source: 'AI Enrichment (Standardization Agent)' },
+      { id: 'p13', key: 'Recommended Service Interval', value: '8,000', unit: 'Operating Hours', confidence: 0.89, verified: true, source: 'AI Enrichment (Maintenance Agent)' },
+    ],
+  },
+  {
     id: '11111111-1111-1111-1111-111111111111',
     name: 'Siemens SIMATIC S7-1500 CPU 1516-3 PN/DP',
     manufacturer: 'Siemens AG',
@@ -639,6 +670,39 @@ export async function fetchEnrichmentSummary(productId: string): Promise<any> {
 // ==========================================
 
 export const mockConflictsStore: Record<string, any[]> = {
+  '77777777-7777-7777-7777-777777777777': [
+    {
+      id: 'conf-pump-1',
+      product_id: '77777777-7777-7777-7777-777777777777',
+      product_name: 'Flowserve Durco Mark 3 ISO Industrial Centrifugal Pump',
+      attribute_name: 'Max Operating Temperature',
+      key: 'Max Operating Temperature',
+      current_value: '180 °C',
+      status: 'conflict',
+      candidates: [
+        {
+          candidate_id: 'cand-pump-1',
+          value: '180',
+          unit: '°C',
+          source_name: 'Durco_Mark3_ISO_Technical_Catalog.pdf (p.4)',
+          source_type: 'pdf',
+          confidence: 0.94,
+          evidence_text: 'Maximum continuous fluid operating temperature limit is 180°C for standard synthetic elastomeric seals (Section 3.2).'
+        },
+        {
+          candidate_id: 'cand-pump-2',
+          value: '210',
+          unit: '°C',
+          source_name: 'Flowserve Official Catalog Webpage',
+          source_type: 'website',
+          source_url: 'https://www.flowserve.com/en/products/pumps/durco-mark-3-iso',
+          confidence: 0.81,
+          evidence_text: 'Heavy duty liquid fluid rating extended up to 210°C with high-temp Kalrez packing option.'
+        }
+      ],
+      created_at: new Date(Date.now() - 3600000 * 2).toISOString()
+    }
+  ],
   '22222222-2222-2222-2222-222222222222': [
     {
       id: 'conf-101',

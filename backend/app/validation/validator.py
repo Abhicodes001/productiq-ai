@@ -9,6 +9,41 @@ logger = logging.getLogger(__name__)
 
 # Global mock database for conflicts and review audit trail
 MOCK_CONFLICTS_STORE: Dict[str, List[Dict[str, Any]]] = {
+    "77777777-7777-7777-7777-777777777777": [
+        {
+            "id": "conf-pump-1",
+            "product_id": "77777777-7777-7777-7777-777777777777",
+            "attribute_name": "Max Operating Temperature",
+            "key": "Max Operating Temperature",
+            "current_value": "180 °C",
+            "status": "conflict",
+            "candidates": [
+                {
+                    "candidate_id": "cand-pump-1",
+                    "value": "180",
+                    "unit": "°C",
+                    "source_name": "Durco_Mark3_ISO_Technical_Catalog.pdf",
+                    "source_type": "pdf",
+                    "source_url": None,
+                    "page_number": 4,
+                    "confidence": 0.94,
+                    "evidence_text": "Maximum continuous fluid operating temperature limit is 180°C for standard synthetic elastomeric seals (Section 3.2)."
+                },
+                {
+                    "candidate_id": "cand-pump-2",
+                    "value": "210",
+                    "unit": "°C",
+                    "source_name": "Flowserve Official Catalog Webpage",
+                    "source_type": "website",
+                    "source_url": "https://www.flowserve.com/en/products/pumps/durco-mark-3-iso",
+                    "page_number": None,
+                    "confidence": 0.81,
+                    "evidence_text": "Heavy duty liquid fluid rating extended up to 210°C with high-temp Kalrez packing option."
+                }
+            ],
+            "created_at": datetime.now().isoformat()
+        }
+    ],
     "22222222-2222-2222-2222-222222222222": [
         {
             "id": "conf-1",

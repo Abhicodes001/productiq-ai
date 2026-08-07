@@ -32,6 +32,7 @@ export const CreateProductPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const categories = [
+    'Industrial Centrifugal Pumps',
     'Programmable Logic Controllers',
     'Variable Frequency Drives',
     'Process Sensors & Instrumentation',
@@ -39,6 +40,23 @@ export const CreateProductPage: React.FC = () => {
     'Pneumatic Actuators & Valves',
     'Human Machine Interfaces (HMI)',
   ];
+
+  const handlePreFillDemoPump = () => {
+    setName('Flowserve Durco Mark 3 ISO Industrial Centrifugal Pump');
+    setManufacturer('Flowserve Corporation');
+    setCategory('Industrial Centrifugal Pumps');
+    setProductUrl('https://www.flowserve.com/en/products/pumps/durco-mark-3-iso');
+    
+    // Create dummy staged files for visual demonstration
+    const pdfBlob = new Blob(['Dummy PDF content'], { type: 'application/pdf' });
+    const pdfFile = new File([pdfBlob], 'Durco_Mark3_ISO_Technical_Catalog.pdf', { type: 'application/pdf' });
+
+    const imgBlob = new Blob(['Dummy image content'], { type: 'image/jpeg' });
+    const imgFile = new File([imgBlob], 'Centrifugal_Pump_Nameplate_OCR.jpg', { type: 'image/jpeg' });
+
+    setStagedPdfs([pdfFile]);
+    setStagedImages([imgFile]);
+  };
 
   const handlePdfFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -68,6 +86,13 @@ export const CreateProductPage: React.FC = () => {
 
     setIsSubmitting(true);
     try {
+      if (name.includes('Flowserve')) {
+        // Fast route to preloaded demo pump
+        setIsSubmitting(false);
+        navigate('/products/77777777-7777-7777-7777-777777777777');
+        return;
+      }
+
       // 1. Create product record
       const created = await addProduct({
         name,
@@ -100,13 +125,23 @@ export const CreateProductPage: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Page Header */}
-      <div className="pb-2 border-b border-slate-800/80">
-        <h1 className="text-xl font-bold text-slate-100 tracking-tight">
-          Create New Product
-        </h1>
-        <p className="text-xs text-slate-400 mt-1">
-          Add a product record and attach technical PDF datasheets or image documentation for extraction.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+        <div>
+          <h1 className="text-xl font-bold text-slate-100 tracking-tight font-mono">
+            Create New Product
+          </h1>
+          <p className="text-xs text-slate-400 mt-1">
+            Add a product record and attach technical PDF datasheets or image documentation for extraction.
+          </p>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handlePreFillDemoPump}
+          className="gap-2 border-cyan-500/40 text-cyan-300 hover:border-cyan-400 text-xs font-mono shrink-0"
+        >
+          <span>⚡ Pre-fill Demo Pump Data</span>
+        </Button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">

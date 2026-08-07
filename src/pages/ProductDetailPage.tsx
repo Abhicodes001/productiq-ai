@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useProductDetail } from '../hooks/useProducts';
 import { StatusBadge } from '../components/common/StatusBadge';
+import { ProcessingPipelineVisualizer } from '../components/common/ProcessingPipelineVisualizer';
 import { EmptyState } from '../components/common/EmptyState';
 import { Button } from '../components/ui/Button';
 import { formatDate, formatPercentage } from '../lib/utils';
@@ -308,11 +309,16 @@ export const ProductDetailPage: React.FC = () => {
       {/* Product Detail Banner Header */}
       <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-slate-100 tracking-tight">
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="text-xl font-bold text-slate-100 tracking-tight font-mono">
               {product.name}
             </h1>
             <StatusBadge status={product.status} />
+            {(product.id === '77777777-7777-7777-7777-777777777777' || (product as any).is_demo) && (
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-500/40 tracking-wider">
+                [DEMO SAMPLE DATA]
+              </span>
+            )}
           </div>
 
           <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-xs text-slate-400 font-mono">
@@ -386,6 +392,61 @@ export const ProductDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* 9-Stage Processing Pipeline Architecture */}
+      <ProcessingPipelineVisualizer
+        interactive={true}
+        compact={true}
+        productStatus={product.status}
+        onStageSelect={(stageId) => {
+          if (stageId === 'human_review' || stageId === 'validation') {
+            setActiveTab('review');
+          } else if (stageId === 'graph') {
+            setActiveTab('graph');
+          } else if (stageId === 'commerce_ready') {
+            setActiveTab('readiness');
+          } else if (stageId === 'ai_enrichment') {
+            setActiveTab('enrichment');
+          } else if (stageId === 'rag') {
+            setActiveTab('sources');
+          } else {
+            setActiveTab('specs');
+          }
+        }}
+      />
+
+      {/* Intentional Conflict Highlight Callout (Prompt Item 13 & 14) */}
+      {((product.conflicts_count || 0) > 0 || conflicts.length > 0 || product.status === 'needs_review') && (
+        <div className="bg-amber-950/40 border border-amber-500/40 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg shadow-amber-950/20">
+          <div className="flex items-start gap-3">
+            <div className="p-2 rounded-lg bg-amber-500/20 text-amber-400 shrink-0 mt-0.5">
+              <AlertTriangle className="w-5 h-5 animate-pulse" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h4 className="text-sm font-bold text-amber-200 font-mono">
+                  Attribute Discrepancy Detected — Action Required
+                </h4>
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                  Intentional Conflict
+                </span>
+              </div>
+              <p className="text-xs text-amber-300/90 mt-1 leading-relaxed">
+                Max Operating Temperature has conflicting sources: <strong>PDF Datasheet (180 °C)</strong> vs <strong>Website Catalog (210 °C)</strong>. Send to human expert for candidate resolution.
+              </p>
+            </div>
+          </div>
+
+          <Button
+            size="sm"
+            onClick={() => setActiveTab('review')}
+            className="gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-mono font-bold shrink-0 self-end sm:self-center"
+          >
+            <FileCheck2 className="w-4 h-4" />
+            <span>Open Review Center</span>
+          </Button>
+        </div>
+      )}
 
       {/* PHASE 2: Live Ingestion Pipeline Stage Stepper Banner */}
       {jobStatus && (

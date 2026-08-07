@@ -18,6 +18,7 @@ export interface ProductAttribute {
   source_name?: string;
   source_url?: string | null;
   evidence_text?: string;
+  source?: string;
   verified?: boolean;
 }
 
@@ -67,6 +68,8 @@ export interface Product {
   model_number?: string;
   description?: string;
   product_url?: string;
+  image_url?: string;
+  is_demo?: boolean;
   status: ProductStatus;
   confidence_score: number;
   created_at: string;

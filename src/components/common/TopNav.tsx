@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Bell, LogOut, User, ShieldCheck, Database, Check } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { DemoGuideModal } from './DemoGuideModal';
 
 export const TopNav: React.FC = () => {
   const { user, signOut, isDemoMode } = useAuth();
@@ -22,27 +23,42 @@ export const TopNav: React.FC = () => {
     navigate('/login');
   };
 
-  return (
-    <header className="h-16 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-6 flex items-center justify-between sticky top-0 z-20">
-      {/* Global Search Bar */}
-      <form onSubmit={handleSearchSubmit} className="relative w-72 md:w-96">
-        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search products, SKUs, manufacturers..."
-          className="w-full bg-slate-900/90 border border-slate-800 rounded-md pl-9 pr-4 py-1.5 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition-all font-mono"
-        />
-      </form>
+  const [showDemoModal, setShowDemoModal] = useState(false);
 
-      {/* Right Controls */}
-      <div className="flex items-center gap-3">
-        {/* Environment / Demo Indicator Badge */}
-        <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-400">
-          <Database className="w-3 h-3 text-sky-400" />
-          <span>{isDemoMode ? 'Demo Storage Mode' : 'Supabase Live DB'}</span>
-        </div>
+  return (
+    <>
+      <header className="h-16 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-6 flex items-center justify-between sticky top-0 z-20">
+        {/* Global Search Bar */}
+        <form onSubmit={handleSearchSubmit} className="relative w-64 sm:w-72 md:w-96">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search products, SKUs, manufacturers..."
+            className="w-full bg-slate-900/90 border border-slate-800 rounded-md pl-9 pr-4 py-1.5 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition-all font-mono"
+          />
+        </form>
+
+        {/* Right Controls */}
+        <div className="flex items-center gap-3">
+          {/* Hackathon Demo Hub Trigger Button */}
+          <button
+            onClick={() => setShowDemoModal(true)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-950 via-slate-900 to-indigo-950 border border-cyan-500/40 text-cyan-300 hover:border-cyan-400 text-xs font-mono font-bold shadow-md shadow-cyan-950/50 transition-all hover:scale-105"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+            </span>
+            <span>⚡ Demo Hub</span>
+          </button>
+
+          {/* Environment / Demo Indicator Badge */}
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-400">
+            <Database className="w-3 h-3 text-sky-400" />
+            <span>{isDemoMode ? 'Demo Storage Mode' : 'Supabase Live DB'}</span>
+          </div>
 
         {/* Notifications Popover Toggle */}
         <div className="relative">
@@ -147,5 +163,7 @@ export const TopNav: React.FC = () => {
         </div>
       </div>
     </header>
+    <DemoGuideModal isOpen={showDemoModal} onClose={() => setShowDemoModal(false)} />
+    </>
   );
 };
