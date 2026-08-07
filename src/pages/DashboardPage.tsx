@@ -31,12 +31,12 @@ export const DashboardPage: React.FC = () => {
   const verifiedProducts = products.filter((p) => p.status === 'verified' || p.status === 'commerce_ready').length;
   const needsReview = products.filter((p) => p.status === 'needs_review').length;
   const conflictsDetected = products.reduce((acc, p) => acc + (p.conflicts_count || 0), 0);
-  const conflictsResolved = 4; // Resolved conflict history count
+  const conflictsResolved = totalProducts > 0 ? 4 : 0; // Resolved conflict history count
   const commerceReadyCount = products.filter((p) => p.status === 'commerce_ready' || p.status === 'verified').length;
   const avgConfidence =
     totalProducts > 0
       ? products.reduce((acc, p) => acc + p.confidence_score, 0) / totalProducts
-      : 0.91;
+      : 0;
 
   return (
     <div className="space-y-6">
@@ -56,14 +56,6 @@ export const DashboardPage: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/products/77777777-7777-7777-7777-777777777777')}
-            className="gap-2 border-cyan-500/40 text-cyan-300 hover:border-cyan-400 text-xs font-mono"
-          >
-            <Zap className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Load Demo Pump</span>
-          </Button>
           <Button onClick={() => navigate('/products/create')} className="gap-2 text-xs font-mono">
             <Plus className="w-4 h-4" />
             <span>Create Product</span>
@@ -77,7 +69,7 @@ export const DashboardPage: React.FC = () => {
           title="Products Processed"
           value={totalProducts}
           icon={Boxes}
-          change="+12% total"
+          change={totalProducts > 0 ? "+12% total" : "0 total"}
           changeType="positive"
           subtext="Active in database"
           accentColor="text-sky-400"
@@ -104,16 +96,16 @@ export const DashboardPage: React.FC = () => {
           title="Conflicts Resolved"
           value={conflictsResolved}
           icon={ShieldCheck}
-          change="Audit logged"
+          change={totalProducts > 0 ? "Audit logged" : "No conflicts"}
           changeType="positive"
           subtext="Human verified edits"
           accentColor="text-cyan-400"
         />
         <StatCard
           title="Average Confidence"
-          value={formatPercentage(avgConfidence)}
+          value={totalProducts > 0 ? formatPercentage(avgConfidence) : '0%'}
           icon={BarChart3}
-          change="+3.4% accuracy"
+          change={totalProducts > 0 ? "+3.4% accuracy" : "Awaiting data"}
           changeType="positive"
           subtext="Overall dataset score"
           accentColor="text-indigo-400"
@@ -130,7 +122,12 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* 9-Stage Processing Architecture Visualizer */}
-      <ProcessingPipelineVisualizer interactive={true} compact={false} />
+      <ProcessingPipelineVisualizer
+        interactive={true}
+        compact={false}
+        hasProduct={totalProducts > 0}
+        productStatus={totalProducts > 0 ? (products[0].status || 'needs_review') : 'idle'}
+      />
 
       {/* Recent Products Table Section */}
       <div className="bg-slate-900/90 border border-slate-800 rounded-lg shadow-sm overflow-hidden">

@@ -31,6 +31,7 @@ interface ProcessingPipelineVisualizerProps {
   interactive?: boolean;
   compact?: boolean;
   productStatus?: string;
+  hasProduct?: boolean;
 }
 
 export const PIPELINE_STAGES: PipelineStage[] = [
@@ -131,13 +132,34 @@ export const ProcessingPipelineVisualizer: React.FC<ProcessingPipelineVisualizer
   interactive = true,
   compact = false,
   productStatus = 'needs_review',
+  hasProduct = true,
 }) => {
-  const [activeStepIndex, setActiveStepIndex] = useState<number>(6);
+  const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
-  const [stages, setStages] = useState<PipelineStage[]>(PIPELINE_STAGES);
+  const [stages, setStages] = useState<PipelineStage[]>(() => {
+    if (!hasProduct || productStatus === 'idle') {
+      return PIPELINE_STAGES.map((s) => ({
+        ...s,
+        status: 'pending',
+        latency: '--',
+        metrics: 'Awaiting product',
+      }));
+    }
+    return PIPELINE_STAGES;
+  });
 
   useEffect(() => {
-    if (productStatus === 'verified' || productStatus === 'commerce_ready') {
+    if (!hasProduct || productStatus === 'idle') {
+      setStages(
+        PIPELINE_STAGES.map((s) => ({
+          ...s,
+          status: 'pending',
+          latency: '--',
+          metrics: 'Awaiting product',
+        }))
+      );
+      setActiveStepIndex(0);
+    } else if (productStatus === 'verified' || productStatus === 'commerce_ready') {
       setStages((prev) =>
         prev.map((s) => ({
           ...s,
@@ -149,7 +171,7 @@ export const ProcessingPipelineVisualizer: React.FC<ProcessingPipelineVisualizer
       setStages(PIPELINE_STAGES);
       setActiveStepIndex(6);
     }
-  }, [productStatus]);
+  }, [productStatus, hasProduct]);
 
   const handleSimulate = () => {
     setIsSimulating(true);
