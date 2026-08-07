@@ -14,17 +14,13 @@ import { StatusBadge } from '../components/common/StatusBadge';
 import { EmptyState } from '../components/common/EmptyState';
 import { Button } from '../components/ui/Button';
 import { formatDate, formatPercentage } from '../lib/utils';
-import { ProductStatus } from '../types/product';
+import { ProductStatus, PRODUCT_CATEGORIES } from '../types/product';
 
 export const ProductsPage: React.FC = () => {
   const navigate = useNavigate();
   const { products, loading, filters, setFilters, refreshProducts } = useProducts();
 
-  const categories = [
-    'Programmable Logic Controllers',
-    'Variable Frequency Drives',
-    'Process Sensors & Instrumentation',
-  ];
+  const categories = PRODUCT_CATEGORIES;
 
   return (
     <div className="space-y-6">

@@ -17,6 +17,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useProducts } from '../hooks/useProducts';
 import { uploadProductDocument, uploadProductImage, startProductAnalysis } from '../services/api';
+import { PRODUCT_CATEGORIES } from '../types/product';
 
 export const CreateProductPage: React.FC = () => {
   const navigate = useNavigate();
@@ -24,27 +25,19 @@ export const CreateProductPage: React.FC = () => {
 
   const [name, setName] = useState('');
   const [manufacturer, setManufacturer] = useState('');
-  const [category, setCategory] = useState('Programmable Logic Controllers');
+  const [category, setCategory] = useState(PRODUCT_CATEGORIES[0]);
   const [productUrl, setProductUrl] = useState('');
   
   const [stagedPdfs, setStagedPdfs] = useState<File[]>([]);
   const [stagedImages, setStagedImages] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const categories = [
-    'Industrial Centrifugal Pumps',
-    'Programmable Logic Controllers',
-    'Variable Frequency Drives',
-    'Process Sensors & Instrumentation',
-    'Industrial Robotics',
-    'Pneumatic Actuators & Valves',
-    'Human Machine Interfaces (HMI)',
-  ];
+  const categories = PRODUCT_CATEGORIES;
 
   const handlePreFillDemoPump = () => {
     setName('Flowserve Durco Mark 3 ISO Industrial Centrifugal Pump');
     setManufacturer('Flowserve Corporation');
-    setCategory('Industrial Centrifugal Pumps');
+    setCategory('Industrial Pumps');
     setProductUrl('https://www.flowserve.com/en/products/pumps/durco-mark-3-iso');
     
     // Create dummy staged files for visual demonstration

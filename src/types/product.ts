@@ -2,6 +2,22 @@ export type ProductStatus = 'processing' | 'needs_review' | 'verified' | 'human_
 export type SourceType = 'website' | 'pdf' | 'image' | 'manual';
 export type SourceStatus = 'pending' | 'processing' | 'processed' | 'failed';
 
+export const PRODUCT_CATEGORIES = [
+  'Power Tools',
+  'Hand Tools',
+  'Industrial Power Tools',
+  'Electric Motors',
+  'Industrial Pumps',
+  'Valves & Actuators',
+  'Sensors & Instrumentation',
+  'Industrial Robotics',
+  'PLCs (Programmable Logic Controllers)',
+  'Variable Frequency Drives (VFDs)',
+  'Human Machine Interfaces (HMI)',
+  'Electrical Components',
+  'Safety Equipment',
+];
+
 export interface ProductAttribute {
   id: string;
   product_id?: string;
