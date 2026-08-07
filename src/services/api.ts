@@ -205,6 +205,8 @@ export async function uploadProductImage(productId: string, file: File): Promise
   return docRecord;
 }
 
+const jobProgressStore: Record<string, { stage: string; progress: number; status: string }> = {};
+
 export async function startProductAnalysis(productId: string): Promise<any> {
   try {
     const response = await fetch(`${API_BASE_URL}/products/${productId}/analyze`, {
@@ -218,7 +220,53 @@ export async function startProductAnalysis(productId: string): Promise<any> {
   }
 
   const prod = localProductsStore.find((p) => p.id === productId);
-  if (prod) prod.status = 'processing';
+  if (prod) {
+    prod.status = 'processing';
+    jobProgressStore[productId] = {
+      stage: 'input_received',
+      progress: 20,
+      status: 'processing',
+    };
+
+    setTimeout(() => {
+      if (jobProgressStore[productId]) {
+        jobProgressStore[productId] = { stage: 'website_processing', progress: 40, status: 'processing' };
+      }
+    }, 700);
+
+    setTimeout(() => {
+      if (jobProgressStore[productId]) {
+        jobProgressStore[productId] = { stage: 'documents_processing', progress: 60, status: 'processing' };
+      }
+    }, 1400);
+
+    setTimeout(() => {
+      if (jobProgressStore[productId]) {
+        jobProgressStore[productId] = { stage: 'images_processing', progress: 80, status: 'processing' };
+      }
+    }, 2100);
+
+    setTimeout(() => {
+      if (jobProgressStore[productId]) {
+        jobProgressStore[productId] = { stage: 'finalization', progress: 100, status: 'completed' };
+      }
+      if (prod) {
+        prod.status = 'needs_review';
+        prod.updated_at = new Date().toISOString();
+        if (!prod.attributes || prod.attributes.length === 0) {
+          prod.attributes = [
+            { id: 'attr-1', key: 'Nominal Operating Voltage', value: '230', unit: 'V AC', confidence: 0.96, verified: true, source: 'Technical Datasheet' },
+            { id: 'attr-2', key: 'Power Input Rating', value: '600', unit: 'W', confidence: 0.94, verified: true, source: 'Web Specification' },
+            { id: 'attr-3', key: 'No-load Speed', value: '0 - 2,800', unit: 'RPM', confidence: 0.92, verified: true, source: 'Nameplate OCR' },
+            { id: 'attr-4', key: 'Max Drilling Diameter (Concrete)', value: '13', unit: 'mm', confidence: 0.88, verified: false, source: 'Discrepancy (Web: 13mm / PDF: 15mm)' },
+            { id: 'attr-5', key: 'Chuck Capacity', value: '1.5 - 13', unit: 'mm', confidence: 0.95, verified: true, source: 'Technical Datasheet' },
+            { id: 'attr-6', key: 'Weight without Cable', value: '1.8', unit: 'kg', confidence: 0.98, verified: true, source: 'Technical Datasheet' },
+          ];
+          prod.conflicts_count = 1;
+        }
+      }
+    }, 2800);
+  }
 
   return {
     id: crypto.randomUUID(),
@@ -292,20 +340,30 @@ export async function fetchJobStatus(productId: string): Promise<any> {
 
   const prod = localProductsStore.find((p) => p.id === productId);
 
+  if (prod?.status === 'processing' && !jobProgressStore[productId]) {
+    startProductAnalysis(productId);
+  }
+
+  const job = jobProgressStore[productId];
+  const isProcessing = prod?.status === 'processing';
+  const progress = job?.progress ?? (isProcessing ? 50 : 100);
+  const currStage = job?.stage ?? (isProcessing ? 'documents_processing' : 'finalization');
+  const jobStatus = isProcessing ? 'processing' : 'completed';
+
   return {
     job_id: 'job-' + productId.substring(0, 8),
     product_id: productId,
-    status: prod?.status === 'processing' ? 'processing' : 'completed',
-    current_stage: prod?.status === 'processing' ? 'documents_processing' : 'finalization',
-    progress: prod?.status === 'processing' ? 65 : 100,
+    status: jobStatus,
+    current_stage: currStage,
+    progress: progress,
     stages_breakdown: [
       { code: 'input_received', name: 'Input received', status: 'completed' },
-      { code: 'website_processing', name: 'Website processing', status: 'completed' },
-      { code: 'documents_processing', name: 'Documents processing', status: prod?.status === 'processing' ? 'in_progress' : 'completed' },
-      { code: 'images_processing', name: 'Images processing', status: prod?.status === 'processing' ? 'pending' : 'completed' },
-      { code: 'ai_extraction', name: 'AI extraction', status: prod?.status === 'processing' ? 'pending' : 'completed' },
-      { code: 'validation', name: 'Validation', status: prod?.status === 'processing' ? 'pending' : 'completed' },
-      { code: 'finalization', name: 'Finalization', status: prod?.status === 'processing' ? 'pending' : 'completed' },
+      { code: 'website_processing', name: 'Website processing', status: progress >= 40 ? 'completed' : 'in_progress' },
+      { code: 'documents_processing', name: 'Documents processing', status: progress >= 60 ? 'completed' : (progress >= 40 ? 'in_progress' : 'pending') },
+      { code: 'images_processing', name: 'Images processing', status: progress >= 80 ? 'completed' : (progress >= 60 ? 'in_progress' : 'pending') },
+      { code: 'ai_extraction', name: 'AI extraction', status: progress >= 95 ? 'completed' : (progress >= 80 ? 'in_progress' : 'pending') },
+      { code: 'validation', name: 'Validation', status: progress >= 100 ? 'completed' : (progress >= 95 ? 'in_progress' : 'pending') },
+      { code: 'finalization', name: 'Finalization', status: progress >= 100 ? 'completed' : 'pending' },
     ]
   };
 }
