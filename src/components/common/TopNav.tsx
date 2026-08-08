@@ -42,7 +42,7 @@ export const TopNav: React.FC = () => {
 
         {/* Right Controls */}
         <div className="flex items-center gap-3">
-          {/* Hackathon Demo Hub Trigger Button */}
+          {/* Demo Hub Trigger Button */}
           <button
             onClick={() => setShowDemoModal(true)}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-950 via-slate-900 to-indigo-950 border border-cyan-500/40 text-cyan-300 hover:border-cyan-400 text-xs font-mono font-bold shadow-md shadow-cyan-950/50 transition-all hover:scale-105"

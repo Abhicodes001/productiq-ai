@@ -48,7 +48,7 @@ export const DashboardPage: React.FC = () => {
               Intelligence Dashboard
             </h1>
             <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-500/30">
-              Hackathon Live Mode
+              Live Demo Mode
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-1">

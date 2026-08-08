@@ -78,7 +78,7 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({ isOpen, onClose 
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-bold text-slate-100 font-mono">
-                  Hackathon Live Demo Studio
+                  Live Demo Studio
                 </h2>
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                   Preloaded Demo Active
@@ -206,7 +206,7 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({ isOpen, onClose 
           <div className="flex items-center gap-2">
             <Award className="w-4 h-4 text-amber-400" />
             <span className="text-xs text-slate-400 font-mono">
-              ProductIQ AI Enterprise Platform — Hackathon Final Polish
+              ProductIQ AI Enterprise Platform
             </span>
           </div>
           <Button variant="outline" size="sm" onClick={onClose}>
