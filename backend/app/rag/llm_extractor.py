@@ -229,7 +229,7 @@ class LLMExtractorService:
         for s in sources:
             match = re.search(pattern, s["text"], re.IGNORECASE)
             if match:
-                val = match.group(1).strip()
+                val = match.group(1).strip().strip("'\"")
                 unit = None
                 # Infer unit from val if present
                 if "V" in val: unit = "V"

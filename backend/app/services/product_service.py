@@ -270,14 +270,13 @@ class ProductService:
 
         # Launch async task in background
         try:
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                loop.create_task(IngestionPipelineService.run_ingestion_pipeline(product_id, job_id))
-            else:
+            loop = asyncio.get_running_loop()
+            loop.create_task(IngestionPipelineService.run_ingestion_pipeline(product_id, job_id))
+        except RuntimeError:
+            try:
                 asyncio.run(IngestionPipelineService.run_ingestion_pipeline(product_id, job_id))
-        except Exception as e:
-            # Fallback for background execution
-            asyncio.create_task(IngestionPipelineService.run_ingestion_pipeline(product_id, job_id))
+            except Exception as bg_err:
+                print(f"Background pipeline startup warning: {bg_err}")
 
         return job_record
 

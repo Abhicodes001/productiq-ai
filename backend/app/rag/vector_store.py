@@ -1,17 +1,44 @@
 import logging
 import math
 import re
+import hashlib
 from typing import List, Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
-# Check if qdrant_client or fastembed are available; if not, use standard cosine similarity vector engine
-try:
-    from qdrant_client import QdrantClient
-    from qdrant_client.models import VectorParams, Distance, PointStruct, Filter, FieldCondition, MatchValue
-    HAS_QDRANT = True
-except ImportError:
-    HAS_QDRANT = False
+# Standard stop words to ignore during vector embedding generation to prevent query dilution
+STOP_WORDS = {
+    'a', 'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and',
+    'any', 'are', 'aren\'t', 'as', 'at', 'be', 'because', 'been', 'before', 'being',
+    'below', 'between', 'both', 'but', 'by', 'can', 'can\'t', 'cannot', 'could',
+    'did', 'do', 'does', 'doing', 'down', 'during', 'each', 'few', 'for', 'from',
+    'further', 'had', 'has', 'have', 'having', 'he', 'her', 'here', 'hers', 'herself',
+    'him', 'himself', 'his', 'how', 'i', 'if', 'in', 'into', 'is', 'it', 'its',
+    'itself', 'just', 'me', 'more', 'most', 'my', 'myself', 'no', 'nor', 'not',
+    'of', 'off', 'on', 'once', 'only', 'or', 'other', 'our', 'ours', 'ourselves',
+    'out', 'over', 'own', 'same', 'she', 'should', 'so', 'some', 'such', 'than',
+    'that', 'the', 'their', 'theirs', 'them', 'themselves', 'then', 'there', 'these',
+    'they', 'this', 'those', 'through', 'to', 'too', 'under', 'until', 'up', 'very',
+    'was', 'we', 'were', 'what', 'when', 'where', 'which', 'while', 'who', 'whom',
+    'why', 'with', 'would', 'you', 'your', 'yours', 'yourself', 'yourselves'
+}
+
+def deterministic_hash(text: str) -> int:
+    """Returns a 32-bit deterministic integer hash for text string."""
+    return int(hashlib.md5(text.encode('utf-8')).hexdigest()[:8], 16)
+
+SPEC_SYNONYMS = {
+    'voltage': ['v', 'vac', 'vdc', 'volt', 'volts', 'voltage', 'supply', '230v', '415v', '24v'],
+    'power': ['w', 'kw', 'watt', 'watts', 'hp', 'power', 'rating'],
+    'current': ['a', 'amp', 'amps', 'ma', 'current', 'output'],
+    'frequency': ['hz', 'khz', 'mhz', 'freq', 'frequency'],
+    'temperature': ['c', 'f', 'temp', 'temperature', '°c', '℃', 'ambient'],
+    'weight': ['kg', 'g', 'lbs', 'weight', 'mass'],
+    'dimensions': ['mm', 'cm', 'in', 'dimensions', 'size', 'wxhxd'],
+    'pressure': ['bar', 'psi', 'kpa', 'pressure'],
+    'flow': ['l/min', 'gpm', 'flow'],
+    'speed': ['rpm', 'speed', 'rotation']
+}
 
 class VectorStoreService:
     """
@@ -26,23 +53,28 @@ class VectorStoreService:
         """
         Generates a 128-dimensional dense embedding vector for semantic search.
         Uses deterministic text feature hashing + n-gram frequency normalization.
+        Filters out common stop words to concentrate vector mass on domain technical terms.
         """
         dim = 128
         vec = [0.0] * dim
-        clean = re.sub(r'[^\w\s]', '', text.lower())
-        words = clean.split()
+        clean = re.sub(r'[^\w\s]', ' ', text.lower())
+        words = [w for w in clean.split() if w and w not in STOP_WORDS]
+
+        # Fallback if text only contained stop words
+        if not words:
+            words = clean.split()
 
         for idx, word in enumerate(words):
-            hash_val = hash(word)
+            hash_val = deterministic_hash(word)
             pos = abs(hash_val) % dim
-            val = (hash_val % 100) / 100.0
-            vec[pos] += val + (1.0 / (idx + 1))
+            val = ((hash_val % 100) / 100.0) + 1.0
+            vec[pos] += val
 
-            # Character bi-grams for technical codes & numbers
+            # Character bi-grams for technical codes, numbers, and units
             for j in range(len(word) - 1):
                 bigram = word[j:j+2]
-                bpos = abs(hash(bigram)) % dim
-                vec[bpos] += 0.5
+                bpos = abs(deterministic_hash(bigram)) % dim
+                vec[bpos] += 0.4
 
         # L2 Normalization
         norm = math.sqrt(sum(v * v for v in vec))
@@ -76,6 +108,9 @@ class VectorStoreService:
         indexed_count = 0
         for chunk in chunks:
             text = chunk.get("text", "")
+            if not text.strip():
+                continue
+
             embedding = cls.generate_embedding(text)
             
             entry = {
@@ -111,19 +146,29 @@ class VectorStoreService:
             return []
 
         query_vec = cls.generate_embedding(query)
-        query_words = set(re.findall(r'\w+', query.lower()))
+        query_words = [w.lower() for w in re.findall(r'\w+', query) if w.lower() not in STOP_WORDS]
+        if not query_words:
+            query_words = [w.lower() for w in re.findall(r'\w+', query)]
 
         scored_results = []
         for item in collection:
             sim = cls.calculate_cosine_similarity(query_vec, item["embedding"])
-            
-            # Keyword relevance boost for exact technical terms / model codes
             item_text_lower = item["text"].lower()
-            overlap = sum(1 for w in query_words if len(w) > 2 and w in item_text_lower)
-            if overlap > 0:
-                sim += (overlap * 0.08)
+            
+            # Keyword relevance boost for exact technical terms, specs, or model codes
+            overlap = 0
+            for w in query_words:
+                if len(w) >= 2 and w in item_text_lower:
+                    overlap += 1
+                elif w in SPEC_SYNONYMS:
+                    syns = SPEC_SYNONYMS[w]
+                    if any(syn in item_text_lower for syn in syns):
+                        overlap += 1
 
-            sim = min(1.0, round(sim, 4))
+            if overlap > 0:
+                sim += (overlap * 0.25)
+
+            sim = min(0.99, round(sim, 4))
 
             if sim >= min_score:
                 scored_results.append({
@@ -136,3 +181,4 @@ class VectorStoreService:
         # Sort descending by similarity score
         scored_results.sort(key=lambda x: x["similarity_score"], reverse=True)
         return scored_results[:top_k]
+

@@ -167,6 +167,13 @@ class IngestionPipelineService:
             product["status"] = "verified" if avg_conf >= 0.90 else "needs_review"
             product["updated_at"] = datetime.now(timezone.utc)
 
+            # Auto-index extracted context into vector store for RAG
+            try:
+                from app.rag.rag_service import RAGService
+                RAGService.index_product_documents(product_id)
+            except Exception as index_err:
+                logger.warning(f"Auto vector indexing after ingestion warning: {index_err}")
+
             job["status"] = "completed"
             logger.info(f"Phase 3 Pipeline completed for job '{job_id}'. Stored {len(stored_attributes)} attributes ({verified_count} verified).")
 
@@ -175,3 +182,4 @@ class IngestionPipelineService:
             job["status"] = "failed"
             job["error_message"] = str(e)
             product["status"] = "failed"
+
