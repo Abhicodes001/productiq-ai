@@ -19,7 +19,7 @@ export const StatCard: React.FC<StatCardProps> = ({
   change,
   changeType = 'neutral',
   subtext,
-  accentColor = 'text-sky-400',
+  accentColor = 'text-red-400',
 }) => {
   return (
     <div className="bg-slate-900/80 border border-slate-800 rounded-lg p-5 hover:border-slate-700 transition-all shadow-sm">

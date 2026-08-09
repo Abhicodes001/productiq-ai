@@ -80,11 +80,11 @@ export const SourcePanel: React.FC<SourcePanelProps> = ({
               className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all flex items-center justify-between group"
             >
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-8 h-8 rounded-lg bg-slate-800/80 flex items-center justify-center text-slate-400 group-hover:text-cyan-400 transition-colors">
+                <div className="w-8 h-8 rounded-lg bg-slate-800/80 flex items-center justify-center text-slate-400 group-hover:text-red-400 transition-colors">
                   {icon}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-semibold text-slate-200 truncate group-hover:text-cyan-300 transition-colors">
+                  <p className="text-xs font-semibold text-slate-200 truncate group-hover:text-red-300 transition-colors">
                     {item.source_name || item.source_url || 'Unnamed Source'}
                   </p>
                   <div className="flex items-center gap-2 text-[11px] text-slate-400">
@@ -104,7 +104,7 @@ export const SourcePanel: React.FC<SourcePanelProps> = ({
                     href={item.source_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-slate-800 transition-colors"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors"
                     title="Open URL"
                   >
                     <ExternalLink className="w-4 h-4" />
@@ -137,7 +137,7 @@ export const SourcePanel: React.FC<SourcePanelProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <Database className="w-5 h-5 text-cyan-400" />
+            <Database className="w-5 h-5 text-red-400" />
             <h3 className="text-lg font-bold text-slate-100">Product Source Intelligence Panel</h3>
           </div>
           <p className="text-xs text-slate-400 mt-1">
@@ -160,7 +160,7 @@ export const SourcePanel: React.FC<SourcePanelProps> = ({
             <button
               onClick={onIndexSources}
               disabled={isIndexing}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-white text-xs font-semibold transition-all shadow-lg shadow-cyan-600/20"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white text-xs font-semibold transition-all shadow-lg shadow-red-600/20"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isIndexing ? 'animate-spin' : ''}`} />
               {isIndexing ? 'Indexing Vectors...' : 'Build Vector Index'}
@@ -173,10 +173,10 @@ export const SourcePanel: React.FC<SourcePanelProps> = ({
       <div className="space-y-6">
         {renderSourceGroup(
           'Official Website',
-          <Globe className="w-4 h-4 text-sky-400" />,
+          <Globe className="w-4 h-4 text-red-400" />,
           officialWebsites,
           'No official website URL sources attached yet.',
-          'bg-sky-500/10 text-sky-400 border border-sky-500/20'
+          'bg-red-500/10 text-red-400 border border-red-500/20'
         )}
 
         {renderSourceGroup(

@@ -14,7 +14,7 @@ export const EnrichmentSummaryCard: React.FC<EnrichmentSummaryCardProps> = ({ su
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-800 pb-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+          <div className="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20">
             <Award className="w-5 h-5" />
           </div>
           <div>
@@ -25,7 +25,7 @@ export const EnrichmentSummaryCard: React.FC<EnrichmentSummaryCardProps> = ({ su
 
         <div className="text-right">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Completeness</span>
-          <p className="text-xl font-bold font-mono text-cyan-400">
+          <p className="text-xl font-bold font-mono text-red-400">
             {summary.overall_completeness_percent}%
           </p>
         </div>
@@ -43,11 +43,11 @@ export const EnrichmentSummaryCard: React.FC<EnrichmentSummaryCardProps> = ({ su
         </div>
 
         <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 space-y-1">
-          <div className="flex items-center justify-between text-xs text-cyan-400 font-semibold">
+          <div className="flex items-center justify-between text-xs text-red-400 font-semibold">
             <span>AI Enriched</span>
             <Sparkles className="w-4 h-4" />
           </div>
-          <p className="text-2xl font-bold font-mono text-cyan-400">{summary.ai_enriched_count}</p>
+          <p className="text-2xl font-bold font-mono text-red-400">{summary.ai_enriched_count}</p>
           <span className="text-[10px] text-slate-500 font-mono">Multi-Agent Grounded</span>
         </div>
 
@@ -84,7 +84,7 @@ export const EnrichmentSummaryCard: React.FC<EnrichmentSummaryCardProps> = ({ su
 
           <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800/80 space-y-1">
             <span className="text-[10px] text-slate-400 block font-bold">P2: Web Spec</span>
-            <span className="text-sm font-bold text-sky-400">{pBreakdown.P2 || 0} Specs</span>
+            <span className="text-sm font-bold text-red-400">{pBreakdown.P2 || 0} Specs</span>
           </div>
 
           <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800/80 space-y-1">

@@ -131,7 +131,7 @@ export const CreateProductPage: React.FC = () => {
           type="button"
           variant="outline"
           onClick={handlePreFillDemoPump}
-          className="gap-2 border-cyan-500/40 text-cyan-300 hover:border-cyan-400 text-xs font-mono shrink-0"
+          className="gap-2 border-red-500/40 text-red-300 hover:border-red-400 text-xs font-mono shrink-0"
         >
           <span>⚡ Pre-fill Demo Pump Data</span>
         </Button>
@@ -168,7 +168,7 @@ export const CreateProductPage: React.FC = () => {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-800 rounded-md px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-sky-500 font-sans"
+                className="w-full bg-slate-900 border border-slate-800 rounded-md px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-red-500 font-sans"
               >
                 {categories.map((cat) => (
                   <option key={cat} value={cat} className="bg-slate-900 text-slate-200">
@@ -197,7 +197,7 @@ export const CreateProductPage: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* PDF Upload Box */}
-            <div className="border-2 border-dashed border-slate-800 hover:border-sky-500/60 transition-colors rounded-lg p-6 text-center bg-slate-950/40 relative group">
+            <div className="border-2 border-dashed border-slate-800 hover:border-red-500/60 transition-colors rounded-lg p-6 text-center bg-slate-950/40 relative group">
               <input
                 type="file"
                 accept=".pdf"
@@ -205,7 +205,7 @@ export const CreateProductPage: React.FC = () => {
                 onChange={handlePdfFileSelect}
                 className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
               />
-              <div className="p-3 rounded-full bg-slate-900 border border-slate-800 text-sky-400 inline-block mb-2 group-hover:scale-105 transition-transform">
+              <div className="p-3 rounded-full bg-slate-900 border border-slate-800 text-red-400 inline-block mb-2 group-hover:scale-105 transition-transform">
                 <FileText className="w-5 h-5" />
               </div>
               <p className="text-xs font-semibold text-slate-200">
@@ -218,7 +218,7 @@ export const CreateProductPage: React.FC = () => {
               {stagedPdfs.length > 0 && (
                 <div className="mt-3 text-left space-y-1.5 z-20 relative">
                   {stagedPdfs.map((file, idx) => (
-                    <div key={idx} className="flex items-center justify-between gap-1.5 text-[11px] text-sky-400 font-mono bg-sky-950/60 px-2 py-1.5 rounded border border-sky-900/60">
+                    <div key={idx} className="flex items-center justify-between gap-1.5 text-[11px] text-red-400 font-mono bg-red-950/60 px-2 py-1.5 rounded border border-red-900/60">
                       <div className="flex items-center gap-1.5 overflow-hidden">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                         <span className="truncate">{file.name}</span>
@@ -241,7 +241,7 @@ export const CreateProductPage: React.FC = () => {
             </div>
 
             {/* Image Upload Box */}
-            <div className="border-2 border-dashed border-slate-800 hover:border-indigo-500/60 transition-colors rounded-lg p-6 text-center bg-slate-950/40 relative group">
+            <div className="border-2 border-dashed border-slate-800 hover:border-red-500/60 transition-colors rounded-lg p-6 text-center bg-slate-950/40 relative group">
               <input
                 type="file"
                 accept="image/*"
@@ -249,7 +249,7 @@ export const CreateProductPage: React.FC = () => {
                 onChange={handleImageFileSelect}
                 className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
               />
-              <div className="p-3 rounded-full bg-slate-900 border border-slate-800 text-indigo-400 inline-block mb-2 group-hover:scale-105 transition-transform">
+              <div className="p-3 rounded-full bg-slate-900 border border-slate-800 text-red-400 inline-block mb-2 group-hover:scale-105 transition-transform">
                 <ImageIcon className="w-5 h-5" />
               </div>
               <p className="text-xs font-semibold text-slate-200">
@@ -262,7 +262,7 @@ export const CreateProductPage: React.FC = () => {
               {stagedImages.length > 0 && (
                 <div className="mt-3 text-left space-y-1.5 z-20 relative">
                   {stagedImages.map((file, idx) => (
-                    <div key={idx} className="flex items-center justify-between gap-1.5 text-[11px] text-indigo-400 font-mono bg-indigo-950/60 px-2 py-1.5 rounded border border-indigo-900/60">
+                    <div key={idx} className="flex items-center justify-between gap-1.5 text-[11px] text-red-400 font-mono bg-red-950/60 px-2 py-1.5 rounded border border-red-900/60">
                       <div className="flex items-center gap-1.5 overflow-hidden">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                         <span className="truncate">{file.name}</span>

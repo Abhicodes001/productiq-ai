@@ -50,8 +50,8 @@ export const CommerceReadinessCard: React.FC<CommerceReadinessCardProps> = ({
         );
       case 'verified':
         return (
-          <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40 flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
+          <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-red-500/20 text-red-300 border border-red-500/40 flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-red-400" />
             Verified
           </span>
         );

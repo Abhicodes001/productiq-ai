@@ -217,7 +217,7 @@ export const ProcessingPipelineVisualizer: React.FC<ProcessingPipelineVisualizer
       <div className="bg-industrial-900/90 border border-slate-800 rounded-xl p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-cyan-400 animate-pulse" />
+            <Sparkles className="w-4 h-4 text-red-400 animate-pulse" />
             <span className="text-xs font-mono font-semibold text-slate-200 uppercase tracking-wider">
               9-Stage Intelligence Pipeline
             </span>
@@ -228,16 +228,16 @@ export const ProcessingPipelineVisualizer: React.FC<ProcessingPipelineVisualizer
               size="sm"
               onClick={handleSimulate}
               disabled={isSimulating}
-              className="h-7 text-xs gap-1.5 border-slate-700 hover:border-cyan-500/50"
+              className="h-7 text-xs gap-1.5 border-slate-700 hover:border-red-500/50"
             >
               {isSimulating ? (
                 <>
-                  <Clock className="w-3 h-3 text-cyan-400 animate-spin" />
+                  <Clock className="w-3 h-3 text-red-400 animate-spin" />
                   <span>Processing...</span>
                 </>
               ) : (
                 <>
-                  <Play className="w-3 h-3 text-cyan-400" />
+                  <Play className="w-3 h-3 text-red-400" />
                   <span>Re-run Pipeline</span>
                 </>
               )}
@@ -261,7 +261,7 @@ export const ProcessingPipelineVisualizer: React.FC<ProcessingPipelineVisualizer
                 }}
                 className={`relative flex flex-col items-center justify-center p-2 rounded-md transition-all text-center group ${
                   isActive
-                    ? 'bg-cyan-950/80 border border-cyan-500/50 text-cyan-300 shadow-lg shadow-cyan-950/50 scale-105 z-10'
+                    ? 'bg-red-950/80 border border-red-500/50 text-red-300 shadow-lg shadow-red-950/50 scale-105 z-10'
                     : isCompleted
                     ? 'bg-slate-900/60 border border-emerald-500/30 text-emerald-400 hover:bg-slate-800/80'
                     : isInProgress
@@ -270,7 +270,7 @@ export const ProcessingPipelineVisualizer: React.FC<ProcessingPipelineVisualizer
                 }`}
                 title={`${stage.name}: ${stage.description}`}
               >
-                <Icon className={`w-4 h-4 mb-1 ${isActive ? 'text-cyan-400' : isCompleted ? 'text-emerald-400' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 mb-1 ${isActive ? 'text-red-400' : isCompleted ? 'text-emerald-400' : 'text-slate-400'}`} />
                 <span className="text-[10px] font-mono font-medium truncate w-full">
                   {stage.shortName}
                 </span>
@@ -290,14 +290,14 @@ export const ProcessingPipelineVisualizer: React.FC<ProcessingPipelineVisualizer
 
   return (
     <div className="bg-industrial-900 border border-slate-800 rounded-xl p-5 space-y-5 shadow-2xl relative overflow-hidden">
-      <div className="absolute top-0 right-0 -mt-12 -mr-12 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 -mb-12 -ml-12 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 -mt-12 -mr-12 w-64 h-64 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 -mb-12 -ml-12 w-64 h-64 bg-red-950/20 rounded-full blur-3xl pointer-events-none" />
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium bg-cyan-950 border border-cyan-500/30 text-cyan-300">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-medium bg-red-950 border border-red-500/30 text-red-300">
+              <Sparkles className="w-3.5 h-3.5 text-red-400 animate-pulse" />
               ProductIQ Processing Architecture
             </span>
             <span className="text-xs text-slate-500 font-mono">| 9 End-to-End Stages</span>
@@ -314,16 +314,16 @@ export const ProcessingPipelineVisualizer: React.FC<ProcessingPipelineVisualizer
               size="sm"
               onClick={handleSimulate}
               disabled={isSimulating}
-              className="gap-2 border-slate-700 hover:border-cyan-500/50 text-xs font-mono"
+              className="gap-2 border-slate-700 hover:border-red-500/50 text-xs font-mono"
             >
               {isSimulating ? (
                 <>
-                  <Clock className="w-3.5 h-3.5 text-cyan-400 animate-spin" />
+                  <Clock className="w-3.5 h-3.5 text-red-400 animate-spin" />
                   <span>Simulating Pipeline...</span>
                 </>
               ) : (
                 <>
-                  <Play className="w-3.5 h-3.5 text-cyan-400" />
+                  <Play className="w-3.5 h-3.5 text-red-400" />
                   <span>Simulate Execution</span>
                 </>
               )}
@@ -352,7 +352,7 @@ export const ProcessingPipelineVisualizer: React.FC<ProcessingPipelineVisualizer
                 }}
                 className={`cursor-pointer rounded-xl p-3 border transition-all duration-200 flex flex-col justify-between relative group ${
                   isActive
-                    ? 'bg-cyan-950/80 border-cyan-500/60 shadow-lg shadow-cyan-950/50 ring-1 ring-cyan-500/40 translate-y-[-2px]'
+                    ? 'bg-red-950/80 border-red-500/60 shadow-lg shadow-red-950/50 ring-1 ring-red-500/40 translate-y-[-2px]'
                     : isCompleted
                     ? 'bg-industrial-950/80 border-emerald-500/30 hover:border-emerald-500/60 hover:bg-slate-900/90'
                     : isInProgress
@@ -363,7 +363,7 @@ export const ProcessingPipelineVisualizer: React.FC<ProcessingPipelineVisualizer
                 <div className="flex items-center justify-between mb-2">
                   <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
                     isActive
-                      ? 'bg-cyan-500/20 text-cyan-300'
+                      ? 'bg-red-500/20 text-red-300'
                       : isCompleted
                       ? 'bg-emerald-500/20 text-emerald-400'
                       : isInProgress
@@ -381,7 +381,7 @@ export const ProcessingPipelineVisualizer: React.FC<ProcessingPipelineVisualizer
                 <div className="flex items-center gap-2 my-1">
                   <div className={`p-1.5 rounded-lg ${
                     isActive
-                      ? 'bg-cyan-500/20 text-cyan-300'
+                      ? 'bg-red-500/20 text-red-300'
                       : isCompleted
                       ? 'bg-emerald-500/10 text-emerald-400'
                       : 'bg-slate-800/60 text-slate-400'
@@ -389,7 +389,7 @@ export const ProcessingPipelineVisualizer: React.FC<ProcessingPipelineVisualizer
                     <Icon className="w-4 h-4" />
                   </div>
                   <span className={`text-xs font-bold font-mono tracking-tight truncate ${
-                    isActive ? 'text-cyan-200' : isCompleted ? 'text-slate-200' : 'text-slate-400'
+                    isActive ? 'text-red-200' : isCompleted ? 'text-slate-200' : 'text-slate-400'
                   }`}>
                     {stage.shortName}
                   </span>
@@ -406,7 +406,7 @@ export const ProcessingPipelineVisualizer: React.FC<ProcessingPipelineVisualizer
 
       <div className="bg-industrial-950/90 border border-slate-800 rounded-lg p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-start gap-3">
-          <div className="p-2.5 rounded-xl bg-cyan-950 border border-cyan-500/30 text-cyan-400 shrink-0">
+          <div className="p-2.5 rounded-xl bg-red-950 border border-red-500/30 text-red-400 shrink-0">
             {React.createElement(activeStage.icon, { className: 'w-5 h-5' })}
           </div>
           <div>
@@ -425,7 +425,7 @@ export const ProcessingPipelineVisualizer: React.FC<ProcessingPipelineVisualizer
         </div>
 
         <div className="flex items-center gap-3 shrink-0 self-end md:self-center">
-          <span className="text-xs font-mono text-cyan-400 font-semibold bg-cyan-950/60 px-3 py-1.5 rounded-lg border border-cyan-500/20">
+          <span className="text-xs font-mono text-red-400 font-semibold bg-red-950/60 px-3 py-1.5 rounded-lg border border-red-500/20">
             {activeStage.metrics}
           </span>
         </div>

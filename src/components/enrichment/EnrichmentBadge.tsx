@@ -27,10 +27,10 @@ export const EnrichmentBadge: React.FC<EnrichmentBadgeProps> = ({
     );
   } else if (normStatus === 'ai_enriched' || normStatus === 'enriched') {
     badgeElement = (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold shadow-sm shadow-cyan-500/10">
-        <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold shadow-sm shadow-red-500/10">
+        <Sparkles className="w-3.5 h-3.5 text-red-400 animate-pulse" />
         <span>✨ AI Enriched</span>
-        <span className="px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 font-mono text-[10px]">
+        <span className="px-1.5 py-0.2 rounded bg-red-950 text-red-300 font-mono text-[10px]">
           P{sourcePriority}
         </span>
       </span>

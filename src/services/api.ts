@@ -481,7 +481,7 @@ export async function askProductQuestion(
   }
 
   // Local fallback: search in-memory mock products
-  const product = MOCK_PRODUCTS.find(p => p.id === productId);
+  const product = localProductsStore.find((p: Product) => p.id === productId);
   const qLower = question.toLowerCase();
 
   if (qLower.includes('unknown') || qLower.includes('secret') || qLower.includes('confidential')) {

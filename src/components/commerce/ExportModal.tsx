@@ -49,7 +49,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         {/* Modal Header */}
         <div className="p-4 bg-industrial-950 border-b border-industrial-800 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-sky-500/10 border border-sky-500/30 text-sky-400">
+            <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400">
               <Download className="w-5 h-5" />
             </div>
             <div>
@@ -75,7 +75,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
             onClick={() => setActiveTab('json')}
             className={`flex items-center gap-2 px-4 py-2 text-xs font-mono font-semibold border-b-2 transition-all ${
               activeTab === 'json'
-                ? 'border-sky-500 text-sky-400 bg-sky-500/10 rounded-t-lg'
+                ? 'border-red-500 text-red-400 bg-red-500/10 rounded-t-lg'
                 : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >

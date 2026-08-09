@@ -332,7 +332,7 @@ export const ProductDetailPage: React.FC = () => {
               href={product.product_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-sky-400 hover:text-sky-300 font-mono"
+              className="inline-flex items-center gap-1 text-xs text-red-400 hover:text-red-300 font-mono"
             >
               <span>{product.product_url}</span>
               <ExternalLink className="w-3 h-3" />
@@ -351,12 +351,12 @@ export const ProductDetailPage: React.FC = () => {
           >
             {isTriggering || product.status === 'processing' ? (
               <>
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-sky-400" />
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-red-400" />
                 <span>Processing...</span>
               </>
             ) : (
               <>
-                <Play className="w-3.5 h-3.5 text-sky-400" />
+                <Play className="w-3.5 h-3.5 text-red-400" />
                 <span>Run Ingestion</span>
               </>
             )}
@@ -366,9 +366,9 @@ export const ProductDetailPage: React.FC = () => {
             size="sm"
             variant="secondary"
             onClick={() => setIsExportModalOpen(true)}
-            className="gap-1.5 font-mono text-xs text-sky-300 border-sky-500/30 hover:border-sky-500/60"
+            className="gap-1.5 font-mono text-xs text-red-300 border-red-500/30 hover:border-red-500/60"
           >
-            <FileJson className="w-3.5 h-3.5 text-sky-400" />
+            <FileJson className="w-3.5 h-3.5 text-red-400" />
             <span>Export JSON</span>
           </Button>
 
@@ -386,7 +386,7 @@ export const ProductDetailPage: React.FC = () => {
             <span className="text-[10px] font-mono uppercase text-slate-400">
               Extraction Confidence
             </span>
-            <span className="text-xl font-bold font-mono text-sky-400">
+            <span className="text-xl font-bold font-mono text-red-400">
               {formatPercentage(product.confidence_score)}
             </span>
           </div>
@@ -415,7 +415,7 @@ export const ProductDetailPage: React.FC = () => {
         }}
       />
 
-      {/* Intentional Conflict Highlight Callout (Prompt Item 13 & 14) */}
+      {/* Intentional Conflict Highlight Callout */}
       {((product.conflicts_count || 0) > 0 || conflicts.length > 0 || product.status === 'needs_review') && (
         <div className="bg-amber-950/40 border border-amber-500/40 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg shadow-amber-950/20">
           <div className="flex items-start gap-3">
@@ -450,15 +450,15 @@ export const ProductDetailPage: React.FC = () => {
 
       {/* PHASE 2: Live Ingestion Pipeline Stage Stepper Banner */}
       {jobStatus && (
-        <div className="bg-slate-950 border border-sky-900/60 rounded-lg p-5 space-y-4">
+        <div className="bg-slate-950 border border-red-900/60 rounded-lg p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Cpu className="w-4 h-4 text-sky-400 animate-pulse" />
+              <Cpu className="w-4 h-4 text-red-400 animate-pulse" />
               <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
                 Multi-Modal Ingestion Pipeline Status
               </h3>
             </div>
-            <span className="text-xs font-mono text-sky-400 font-semibold">
+            <span className="text-xs font-mono text-red-400 font-semibold">
               {jobStatus.progress}% Complete
             </span>
           </div>
@@ -470,7 +470,7 @@ export const ProductDetailPage: React.FC = () => {
                 key={st.code}
                 className={`p-2.5 rounded border text-[11px] font-mono space-y-1 transition-all ${
                   st.status === 'completed'
-                    ? 'bg-sky-950/40 border-sky-800/80 text-sky-300'
+                    ? 'bg-red-950/40 border-red-800/80 text-red-300'
                     : st.status === 'in_progress'
                     ? 'bg-amber-950/50 border-amber-500/80 text-amber-300 animate-pulse'
                     : 'bg-slate-900/40 border-slate-800/80 text-slate-500'
@@ -504,7 +504,7 @@ export const ProductDetailPage: React.FC = () => {
               onClick={() => setActiveTab(tab.key as any)}
               className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors whitespace-nowrap ${
                 isActive
-                  ? 'border-sky-500 text-sky-400 bg-slate-900/50'
+                  ? 'border-red-500 text-red-400 bg-slate-900/50'
                   : 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-700'
               }`}
             >
@@ -900,7 +900,7 @@ export const ProductDetailPage: React.FC = () => {
               <Button
                 size="sm"
                 onClick={() => navigate('/review-center')}
-                className="gap-2 bg-sky-600 hover:bg-sky-500 font-mono text-xs"
+                className="gap-2 bg-red-600 hover:bg-red-500 font-mono text-xs"
               >
                 <FileCheck2 className="w-3.5 h-3.5" />
                 <span>Open Global Review Center</span>
@@ -991,7 +991,7 @@ export const ProductDetailPage: React.FC = () => {
               <Button
                 size="sm"
                 onClick={() => setIsExportModalOpen(true)}
-                className="gap-2 bg-sky-600 hover:bg-sky-500 font-mono text-xs"
+                className="gap-2 bg-red-600 hover:bg-red-500 font-mono text-xs"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Open Full Export Suite</span>
@@ -1002,7 +1002,7 @@ export const ProductDetailPage: React.FC = () => {
               <div className="p-5 bg-slate-950 rounded-xl border border-slate-800 space-y-4 flex flex-col justify-between">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
-                    <FileJson className="w-5 h-5 text-sky-400" />
+                    <FileJson className="w-5 h-5 text-red-400" />
                     <h3 className="text-sm font-bold text-slate-200 font-mono">Standardized JSON Schema</h3>
                   </div>
                   <p className="text-xs text-slate-400">

@@ -36,7 +36,7 @@ export const TopNav: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search products, SKUs, manufacturers..."
-            className="w-full bg-slate-900/90 border border-slate-800 rounded-md pl-9 pr-4 py-1.5 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/50 transition-all font-mono"
+            className="w-full bg-slate-900/90 border border-slate-800 rounded-md pl-9 pr-4 py-1.5 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/50 transition-all font-mono"
           />
         </form>
 
@@ -45,18 +45,18 @@ export const TopNav: React.FC = () => {
           {/* Demo Hub Trigger Button */}
           <button
             onClick={() => setShowDemoModal(true)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-cyan-950 via-slate-900 to-indigo-950 border border-cyan-500/40 text-cyan-300 hover:border-cyan-400 text-xs font-mono font-bold shadow-md shadow-cyan-950/50 transition-all hover:scale-105"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-red-950 via-slate-900 to-red-900 border border-red-500/40 text-red-300 hover:border-red-400 text-xs font-mono font-bold shadow-md shadow-red-950/50 transition-all hover:scale-105"
           >
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
             </span>
             <span>⚡ Demo Hub</span>
           </button>
 
           {/* Environment / Demo Indicator Badge */}
           <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-400">
-            <Database className="w-3 h-3 text-sky-400" />
+            <Database className="w-3 h-3 text-red-400" />
             <span>{isDemoMode ? 'Demo Storage Mode' : 'Supabase Live DB'}</span>
           </div>
 
@@ -71,8 +71,8 @@ export const TopNav: React.FC = () => {
             title="Notifications"
           >
             <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-sky-500 animate-ping" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-sky-500" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 animate-ping" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" />
           </button>
 
           {showNotifications && (
@@ -81,7 +81,7 @@ export const TopNav: React.FC = () => {
                 <span className="text-xs font-semibold text-slate-200 uppercase tracking-wider">
                   Notifications
                 </span>
-                <span className="text-[10px] text-sky-400 font-mono">2 New</span>
+                <span className="text-[10px] text-red-400 font-mono">2 New</span>
               </div>
               <div className="divide-y divide-slate-800/60 max-h-64 overflow-y-auto">
                 <div className="p-3 hover:bg-slate-800/50 transition-colors cursor-pointer">
@@ -116,7 +116,7 @@ export const TopNav: React.FC = () => {
             }}
             className="flex items-center gap-2 p-1.5 rounded-md bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-slate-300 transition-colors"
           >
-            <div className="w-7 h-7 rounded bg-slate-800 flex items-center justify-center text-xs font-bold font-mono text-sky-400 border border-slate-700">
+            <div className="w-7 h-7 rounded bg-slate-800 flex items-center justify-center text-xs font-bold font-mono text-red-400 border border-slate-700">
               {user?.email?.charAt(0).toUpperCase() || 'U'}
             </div>
             <span className="text-xs font-medium text-slate-200 hidden md:block max-w-[120px] truncate">

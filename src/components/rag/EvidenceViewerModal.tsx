@@ -34,7 +34,7 @@ export const EvidenceViewerModal: React.FC<EvidenceViewerModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950/50">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <div className="p-2 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20">
               <Award className="w-5 h-5" />
             </div>
             <div>
@@ -61,7 +61,7 @@ export const EvidenceViewerModal: React.FC<EvidenceViewerModalProps> = ({
               {value && (
                 <div className="text-right">
                   <span className="text-xs font-medium uppercase tracking-wider text-slate-400">Extracted Value</span>
-                  <p className="text-base font-bold text-cyan-400">{value}</p>
+                  <p className="text-base font-bold text-red-400">{value}</p>
                 </div>
               )}
               <div className="text-right">
@@ -90,11 +90,11 @@ export const EvidenceViewerModal: React.FC<EvidenceViewerModalProps> = ({
                   className="p-4 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-slate-700 transition-colors space-y-3"
                 >
                   <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2 text-cyan-400 font-medium">
+                    <div className="flex items-center gap-2 text-red-400 font-medium">
                       {cite.source_type === 'pdf' ? (
                         <FileText className="w-4 h-4 text-rose-400" />
                       ) : (
-                        <Globe className="w-4 h-4 text-sky-400" />
+                        <Globe className="w-4 h-4 text-red-400" />
                       )}
                       <span>{cite.source_name}</span>
                     </div>
@@ -125,7 +125,7 @@ export const EvidenceViewerModal: React.FC<EvidenceViewerModalProps> = ({
                       href={cite.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 font-medium hover:underline pt-1"
+                      className="inline-flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 font-medium hover:underline pt-1"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
                       Open Source Location

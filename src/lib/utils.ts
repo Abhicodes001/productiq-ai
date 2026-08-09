@@ -71,10 +71,10 @@ export function getStatusColor(status: ProductStatus): {
       };
     case 'processing':
       return {
-        bg: 'bg-sky-950/60',
-        text: 'text-sky-400',
-        border: 'border-sky-800/60',
-        dot: 'bg-sky-500 animate-pulse',
+        bg: 'bg-red-950/60',
+        text: 'text-red-400',
+        border: 'border-red-800/60',
+        dot: 'bg-red-500 animate-pulse',
         label: 'Processing',
       };
     case 'failed':

@@ -48,7 +48,7 @@ export const ProductsPage: React.FC = () => {
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
             placeholder="Search by product name, manufacturer..."
-            className="w-full bg-slate-950 border border-slate-800 rounded-md pl-9 pr-4 py-2 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-sky-500"
+            className="w-full bg-slate-950 border border-slate-800 rounded-md pl-9 pr-4 py-2 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-red-500"
           />
         </div>
 
@@ -68,7 +68,7 @@ export const ProductsPage: React.FC = () => {
               <option value="verified" className="bg-slate-900 text-emerald-400">Verified</option>
               <option value="needs_review" className="bg-slate-900 text-amber-400">Needs Review</option>
               <option value="conflict" className="bg-slate-900 text-rose-400">⚠️ Conflict</option>
-              <option value="processing" className="bg-slate-900 text-sky-400">Processing</option>
+              <option value="processing" className="bg-slate-900 text-red-400">Processing</option>
               <option value="failed" className="bg-slate-900 text-rose-400">Failed</option>
               <option value="draft" className="bg-slate-900 text-slate-200">Draft</option>
             </select>
@@ -157,7 +157,7 @@ export const ProductsPage: React.FC = () => {
                   >
                     <td className="px-6 py-4 font-medium text-slate-100">
                       <div className="flex flex-col">
-                        <span className="group-hover:text-sky-400 transition-colors font-semibold text-xs">
+                        <span className="group-hover:text-red-400 transition-colors font-semibold text-xs">
                           {product.name}
                         </span>
                         {product.product_url && (

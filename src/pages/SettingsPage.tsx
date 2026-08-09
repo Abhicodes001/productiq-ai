@@ -18,7 +18,7 @@ export const SettingsPage: React.FC = () => {
 
       <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-6 space-y-4">
         <h2 className="text-xs font-bold text-slate-100 uppercase tracking-wider border-b border-slate-800/80 pb-2 flex items-center gap-2">
-          <Database className="w-4 h-4 text-sky-400" />
+          <Database className="w-4 h-4 text-red-400" />
           <span>Supabase Database & Auth Integration Status</span>
         </h2>
 
@@ -48,7 +48,7 @@ export const SettingsPage: React.FC = () => {
               <span className="text-xs font-bold text-slate-200">Backend FastAPI REST Endpoint</span>
               <p className="text-[11px] text-slate-400 font-mono">http://localhost:8000/api/products</p>
             </div>
-            <span className="px-2.5 py-1 rounded bg-sky-950 text-sky-400 border border-sky-800 text-xs font-mono font-bold">
+            <span className="px-2.5 py-1 rounded bg-red-950 text-red-400 border border-red-800 text-xs font-mono font-bold">
               READY
             </span>
           </div>
@@ -57,7 +57,7 @@ export const SettingsPage: React.FC = () => {
 
       <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-6 space-y-4">
         <h2 className="text-xs font-bold text-slate-100 uppercase tracking-wider border-b border-slate-800/80 pb-2 flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4 text-sky-400" />
+          <ShieldCheck className="w-4 h-4 text-red-400" />
           <span>User & Organization Profile</span>
         </h2>
 

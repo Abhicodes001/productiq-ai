@@ -143,16 +143,16 @@ export const ReviewCenterPage: React.FC = () => {
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1 shadow-sm">
-          <div className="flex items-center justify-between text-xs text-sky-400 font-semibold">
+          <div className="flex items-center justify-between text-xs text-red-400 font-semibold">
             <span>Resolution Accuracy</span>
             <CheckCircle2 className="w-4 h-4" />
           </div>
-          <p className="text-2xl font-bold font-mono text-sky-400">{resolvedCount > 0 ? '99.4%' : '0%'}</p>
+          <p className="text-2xl font-bold font-mono text-red-400">{resolvedCount > 0 ? '99.4%' : '0%'}</p>
           <span className="text-[10px] text-slate-500 font-mono">Verified Specs Standard</span>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1 shadow-sm">
-          <div className="flex items-center justify-between text-xs text-indigo-400 font-semibold">
+          <div className="flex items-center justify-between text-xs text-red-400 font-semibold">
             <span>Avg Review Speed</span>
             <Clock className="w-4 h-4" />
           </div>
@@ -237,7 +237,7 @@ export const ReviewCenterPage: React.FC = () => {
 
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="text-[11px] font-mono text-slate-400">Reviewer:</span>
-                    <span className="text-xs font-mono text-sky-400 font-semibold flex items-center gap-1 bg-slate-950 px-3 py-1 rounded border border-slate-800">
+                    <span className="text-xs font-mono text-red-400 font-semibold flex items-center gap-1 bg-slate-950 px-3 py-1 rounded border border-slate-800">
                       <User className="w-3 h-3" />
                       <span>{reviewerName}</span>
                     </span>
@@ -275,14 +275,14 @@ export const ReviewCenterPage: React.FC = () => {
 
                           <div className="space-y-1 font-mono text-xs">
                             <span className="text-[10px] uppercase text-slate-500 block">Source Trace</span>
-                            <div className="flex items-center gap-1 text-sky-400 font-medium">
+                            <div className="flex items-center gap-1 text-red-400 font-medium">
                               <span>{cand.source_name}</span>
                               {cand.source_url && (
                                 <a
                                   href={cand.source_url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="hover:text-sky-300"
+                                  className="hover:text-red-300"
                                 >
                                   <ExternalLink className="w-3 h-3" />
                                 </a>
@@ -317,7 +317,7 @@ export const ReviewCenterPage: React.FC = () => {
                       size="sm"
                       variant="outline"
                       onClick={() => setSelectedConflict(item)}
-                      className="gap-1.5 font-mono text-xs text-sky-400 hover:text-sky-300 border-sky-900/60"
+                      className="gap-1.5 font-mono text-xs text-red-400 hover:text-red-300 border-red-900/60"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                       <span>Edit Manually</span>
@@ -399,7 +399,7 @@ export const ReviewCenterPage: React.FC = () => {
                           {record.action}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-sky-400">{record.reviewer}</td>
+                      <td className="px-4 py-3 text-red-400">{record.reviewer}</td>
                       <td className="px-4 py-3">
                         <StatusBadge status="human_verified" />
                       </td>
@@ -436,7 +436,7 @@ export const ReviewCenterPage: React.FC = () => {
                   placeholder="e.g. 415 V AC"
                   value={manualValue}
                   onChange={(e) => setManualValue(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-sky-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-red-500"
                 />
               </div>
 
@@ -447,7 +447,7 @@ export const ReviewCenterPage: React.FC = () => {
                   placeholder="e.g. V"
                   value={manualUnit}
                   onChange={(e) => setManualUnit(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-sky-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-red-500"
                 />
               </div>
 
@@ -457,7 +457,7 @@ export const ReviewCenterPage: React.FC = () => {
                   type="text"
                   value={reviewerName}
                   onChange={(e) => setReviewerName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-sky-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-red-500"
                 />
               </div>
             </div>

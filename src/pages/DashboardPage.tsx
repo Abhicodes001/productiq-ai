@@ -47,7 +47,7 @@ export const DashboardPage: React.FC = () => {
             <h1 className="text-xl font-bold text-slate-100 tracking-tight font-mono">
               Intelligence Dashboard
             </h1>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-cyan-950 text-cyan-300 border border-cyan-500/30">
+            <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-red-950 text-red-300 border border-red-500/30">
               Live Demo Mode
             </span>
           </div>
@@ -63,7 +63,7 @@ export const DashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 6 KPI Cards Grid (Prompt Item 4) */}
+      {/* 6 KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <StatCard
           title="Products Processed"
@@ -72,7 +72,7 @@ export const DashboardPage: React.FC = () => {
           change={totalProducts > 0 ? "+12% total" : "0 total"}
           changeType="positive"
           subtext="Active in database"
-          accentColor="text-sky-400"
+          accentColor="text-red-400"
         />
         <StatCard
           title="Verified Products"
@@ -99,7 +99,7 @@ export const DashboardPage: React.FC = () => {
           change={totalProducts > 0 ? "Audit logged" : "No conflicts"}
           changeType="positive"
           subtext="Human verified edits"
-          accentColor="text-cyan-400"
+          accentColor="text-red-400"
         />
         <StatCard
           title="Average Confidence"
@@ -108,7 +108,7 @@ export const DashboardPage: React.FC = () => {
           change={totalProducts > 0 ? "+3.4% accuracy" : "Awaiting data"}
           changeType="positive"
           subtext="Overall dataset score"
-          accentColor="text-indigo-400"
+          accentColor="text-red-400"
         />
         <StatCard
           title="Commerce Ready"
@@ -117,7 +117,7 @@ export const DashboardPage: React.FC = () => {
           change="ERP / PIM ready"
           changeType="positive"
           subtext="JSON & CSV exported"
-          accentColor="text-violet-400"
+          accentColor="text-red-400"
         />
       </div>
 
@@ -142,7 +142,7 @@ export const DashboardPage: React.FC = () => {
           </div>
           <Link
             to="/products"
-            className="text-xs font-semibold text-sky-400 hover:text-sky-300 flex items-center gap-1 font-mono"
+            className="text-xs font-semibold text-red-400 hover:text-red-300 flex items-center gap-1 font-mono"
           >
             <span>View All ({totalProducts})</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -180,7 +180,7 @@ export const DashboardPage: React.FC = () => {
                   >
                     <td className="px-6 py-3.5 font-medium text-slate-100">
                       <div className="flex flex-col">
-                        <span className="group-hover:text-sky-400 transition-colors font-semibold">
+                        <span className="group-hover:text-red-400 transition-colors font-semibold">
                           {product.name}
                         </span>
                         {product.product_url && (

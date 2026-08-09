@@ -65,16 +65,16 @@ export const LandingPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-industrial-950 text-slate-100 font-sans selection:bg-sky-500 selection:text-white">
+    <div className="min-h-screen bg-industrial-950 text-slate-100 font-sans selection:bg-red-500 selection:text-white">
       {/* Top Navbar */}
       <header className="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded bg-gradient-to-br from-sky-500 to-slate-800 flex items-center justify-center text-white border border-sky-400/30">
-              <Cpu className="w-5 h-5 text-sky-200" />
+            <div className="w-8 h-8 rounded bg-gradient-to-br from-red-600 to-red-950 flex items-center justify-center text-white border border-red-500/40 shadow-sm shadow-red-950/50">
+              <Cpu className="w-5 h-5 text-red-100" />
             </div>
-            <span className="font-bold text-base tracking-tight text-slate-100">
-              ProductIQ <span className="text-sky-400 font-mono text-xs px-1 rounded bg-sky-950 border border-sky-800">AI</span>
+            <span className="font-bold text-base tracking-tight text-white">
+              ProductIQ <span className="text-red-400 font-mono text-xs px-1 rounded bg-red-950 border border-red-800">AI</span>
             </span>
           </div>
 
@@ -94,7 +94,7 @@ export const LandingPage: React.FC = () => {
             </Link>
             <Link
               to="/dashboard"
-              className="px-4 py-2 text-xs font-semibold rounded-md bg-sky-600 hover:bg-sky-500 text-white shadow-sm border border-sky-500/40 transition-all flex items-center gap-1.5"
+              className="px-4 py-2 text-xs font-semibold rounded-md bg-red-600 hover:bg-red-500 text-white shadow-sm border border-red-500/40 transition-all flex items-center gap-1.5"
             >
               <span>Dashboard</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -106,8 +106,8 @@ export const LandingPage: React.FC = () => {
       {/* HERO SECTION */}
       <section className="relative pt-20 pb-24 px-6 max-w-7xl mx-auto border-b border-slate-800/60 bg-industrial-grid">
         <div className="max-w-4xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-mono text-sky-400">
-            <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-mono text-red-400">
+            <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
             <span>Industrial Product Intelligence Platform</span>
           </div>
 
@@ -149,7 +149,7 @@ export const LandingPage: React.FC = () => {
               <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
               <span className="ml-2 font-semibold text-slate-300">INDUSTRIAL INTELLIGENCE PIPELINE MONITOR</span>
             </div>
-            <span className="text-sky-400 font-bold">STATUS: RUNNING</span>
+            <span className="text-red-400 font-bold">STATUS: RUNNING</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 text-left">
@@ -186,7 +186,7 @@ export const LandingPage: React.FC = () => {
                 COMMERCE-READY OUTPUT
               </span>
               <p className="text-xs font-semibold text-slate-200">JSON Schema Standard v2.4</p>
-              <pre className="mt-2 text-[10px] text-sky-300 font-mono bg-slate-900 p-2 rounded overflow-x-auto max-h-24">
+              <pre className="mt-2 text-[10px] text-red-300 font-mono bg-slate-900 p-2 rounded overflow-x-auto max-h-24">
 {`{
   "sku": "6ES7516-3AN02",
   "memory_mb": 1,
@@ -202,7 +202,7 @@ export const LandingPage: React.FC = () => {
       {/* AI PIPELINE WORKFLOW VISUALIZATION SECTION */}
       <section id="pipeline" className="py-20 px-6 max-w-7xl mx-auto border-b border-slate-800/60">
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <span className="text-xs font-mono uppercase tracking-wider text-sky-400">END-TO-END PIPELINE</span>
+          <span className="text-xs font-mono uppercase tracking-wider text-red-400">END-TO-END PIPELINE</span>
           <h2 className="text-2xl sm:text-4xl font-bold text-slate-100 mt-2">
             The ProductIQ AI Processing Workflow
           </h2>
@@ -216,10 +216,10 @@ export const LandingPage: React.FC = () => {
           {pipelineSteps.map((step, idx) => (
             <div
               key={step.code}
-              className="bg-slate-900/80 border border-slate-800 rounded-lg p-4 flex flex-col justify-between hover:border-sky-500/50 transition-all group"
+              className="bg-slate-900/80 border border-slate-800 rounded-lg p-4 flex flex-col justify-between hover:border-red-500/50 transition-all group"
             >
               <div>
-                <span className="text-[10px] font-mono font-bold text-sky-400 block mb-1">
+                <span className="text-[10px] font-mono font-bold text-red-400 block mb-1">
                   STEP {step.code}
                 </span>
                 <h3 className="text-xs font-bold text-slate-100 tracking-wide">
@@ -242,7 +242,7 @@ export const LandingPage: React.FC = () => {
       {/* CORE FEATURES SECTION */}
       <section id="features" className="py-20 px-6 max-w-7xl mx-auto border-b border-slate-800/60">
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <span className="text-xs font-mono uppercase tracking-wider text-sky-400">BUILT FOR INDUSTRIAL SAAS</span>
+          <span className="text-xs font-mono uppercase tracking-wider text-red-400">BUILT FOR INDUSTRIAL SAAS</span>
           <h2 className="text-2xl sm:text-4xl font-bold text-slate-100 mt-2">
             Core Platform Capabilities
           </h2>
@@ -256,7 +256,7 @@ export const LandingPage: React.FC = () => {
                 key={idx}
                 className="bg-slate-900/60 border border-slate-800 rounded-lg p-6 hover:border-slate-700 transition-all"
               >
-                <div className="w-10 h-10 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center text-sky-400 mb-4">
+                <div className="w-10 h-10 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center text-red-400 mb-4">
                   <Icon className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-semibold text-slate-100 mb-2">{feat.title}</h3>
@@ -271,7 +271,7 @@ export const LandingPage: React.FC = () => {
       <section id="why-us" className="py-20 px-6 max-w-7xl mx-auto border-b border-slate-800/60">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <span className="text-xs font-mono uppercase tracking-wider text-sky-400">COMPARISON</span>
+            <span className="text-xs font-mono uppercase tracking-wider text-red-400">COMPARISON</span>
             <h2 className="text-2xl sm:text-4xl font-bold text-slate-100 mt-2">
               Why Industrial Leaders Choose ProductIQ AI
             </h2>

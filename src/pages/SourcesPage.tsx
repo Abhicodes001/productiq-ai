@@ -62,7 +62,7 @@ export const SourcesPage: React.FC = () => {
               onClick={() => setFilterType(t)}
               className={`px-3 py-1.5 rounded text-xs font-mono capitalize transition-colors ${
                 filterType === t
-                  ? 'bg-sky-950 text-sky-400 border border-sky-800 font-bold'
+                  ? 'bg-red-950 text-red-400 border border-red-800 font-bold'
                   : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-slate-200'
               }`}
             >
@@ -88,10 +88,10 @@ export const SourcesPage: React.FC = () => {
               filteredSources.map((src) => (
                 <tr key={src.id} className="hover:bg-slate-800/50 transition-colors">
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 font-mono uppercase font-bold text-[11px] text-sky-400">
-                      {src.source_type === 'website' && <Globe className="w-3.5 h-3.5 text-sky-400" />}
+                    <div className="flex items-center gap-2 font-mono uppercase font-bold text-[11px] text-red-400">
+                      {src.source_type === 'website' && <Globe className="w-3.5 h-3.5 text-red-400" />}
                       {src.source_type === 'pdf' && <FileText className="w-3.5 h-3.5 text-emerald-400" />}
-                      {src.source_type === 'image' && <ImageIcon className="w-3.5 h-3.5 text-indigo-400" />}
+                      {src.source_type === 'image' && <ImageIcon className="w-3.5 h-3.5 text-red-400" />}
                       <span>{src.source_type}</span>
                     </div>
                   </td>
@@ -107,11 +107,11 @@ export const SourcesPage: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-slate-300 font-medium">
-                    <a href={`/products/${src.productId}`} className="hover:text-sky-400 hover:underline">
+                    <a href={`/products/${src.productId}`} className="hover:text-red-400 hover:underline">
                       {src.productName}
                     </a>
                   </td>
-                  <td className="px-6 py-4 font-mono text-sky-400 font-bold">
+                  <td className="px-6 py-4 font-mono text-red-400 font-bold">
                     {formatPercentage(src.reliability_score || 0.95)}
                   </td>
                   <td className="px-6 py-4">

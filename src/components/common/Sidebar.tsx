@@ -39,13 +39,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse })
       <div>
         <div className="h-16 flex items-center px-4 border-b border-slate-800/80 justify-between">
           <div className="flex items-center gap-3 overflow-hidden">
-            <div className="w-8 h-8 rounded bg-gradient-to-br from-sky-500 to-slate-800 flex items-center justify-center text-white shrink-0 border border-sky-400/30 shadow-sm">
-              <Cpu className="w-5 h-5 text-sky-200" />
+            <div className="w-8 h-8 rounded bg-gradient-to-br from-red-600 to-red-950 flex items-center justify-center text-white shrink-0 border border-red-500/40 shadow-sm shadow-red-950/50">
+              <Cpu className="w-5 h-5 text-red-100" />
             </div>
             {!collapsed && (
               <div className="flex flex-col min-w-0">
-                <span className="font-bold text-sm text-slate-100 tracking-tight whitespace-nowrap">
-                  ProductIQ <span className="text-sky-400 text-xs font-mono px-1 rounded bg-sky-950/80 border border-sky-800/60 ml-0.5">AI</span>
+                <span className="font-bold text-sm text-white tracking-tight whitespace-nowrap">
+                  ProductIQ <span className="text-red-400 text-xs font-mono px-1 rounded bg-red-950/80 border border-red-800/60 ml-0.5">AI</span>
                 </span>
                 <span className="text-[10px] text-slate-400 font-mono tracking-wider">
                   INDUSTRIAL INTEL
@@ -67,7 +67,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse })
                   cn(
                     'flex items-center gap-3 px-3 py-2.5 rounded-md text-xs font-medium transition-all group relative',
                     isActive
-                      ? 'bg-slate-800/90 text-sky-400 border border-slate-700/80 font-semibold shadow-sm'
+                      ? 'bg-red-950/60 text-red-400 border border-red-900/70 font-semibold shadow-sm'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/80 border border-transparent'
                   )
                 }
@@ -78,7 +78,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggleCollapse })
                   <span className="truncate flex-1">{item.label}</span>
                 )}
                 {!collapsed && item.badge && (
-                  <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded-full bg-amber-950 text-amber-400 border border-amber-800/80">
+                  <span className="px-1.5 py-0.5 text-[10px] font-mono font-bold rounded-full bg-red-950 text-red-400 border border-red-800/80">
                     {item.badge}
                   </span>
                 )}

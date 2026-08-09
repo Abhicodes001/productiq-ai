@@ -72,7 +72,7 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({ isOpen, onClose 
         {/* Modal Top Header */}
         <div className="bg-industrial-950 px-6 py-4 border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-cyan-950 border border-cyan-500/30 text-cyan-400">
+            <div className="p-2 rounded-xl bg-red-950 border border-red-500/30 text-red-400">
               <Zap className="w-5 h-5 animate-pulse" />
             </div>
             <div>
@@ -98,11 +98,11 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({ isOpen, onClose 
           </button>
         </div>
 
-        {/* Narrative Script Callout Banner (Prompt Item 10) */}
-        <div className="bg-cyan-950/40 border-b border-cyan-500/20 px-6 py-3">
+        {/* Narrative Script Callout Banner */}
+        <div className="bg-red-950/40 border-b border-red-500/20 px-6 py-3">
           <div className="flex items-start gap-3">
-            <BookOpen className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-            <p className="text-xs text-cyan-200/90 leading-relaxed font-sans italic">
+            <BookOpen className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+            <p className="text-xs text-red-200/90 leading-relaxed font-sans italic">
               &ldquo;Industrial product data is fragmented across websites, PDFs, catalogs, and images. ProductIQ AI accepts these limited inputs and automatically extracts structured product intelligence. Our AI system uses RAG and source traceability to ground information, AI agents enrich missing fields, and our validation engine flags conflicts for human review before turning products verified & commerce-ready.&rdquo;
             </p>
           </div>
@@ -111,7 +111,7 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({ isOpen, onClose 
         {/* Modal Body */}
         <div className="p-6 overflow-y-auto space-y-6 flex-1">
           {/* Quick Action Banner */}
-          <div className="bg-gradient-to-r from-industrial-950 via-slate-900 to-industrial-950 border border-cyan-500/30 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-gradient-to-r from-industrial-950 via-slate-900 to-industrial-950 border border-red-500/30 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-lg overflow-hidden border border-slate-700 shrink-0">
                 <img
@@ -121,7 +121,7 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({ isOpen, onClose 
                 />
               </div>
               <div>
-                <span className="text-[10px] font-mono text-cyan-400 font-bold tracking-wider uppercase">
+                <span className="text-[10px] font-mono text-red-400 font-bold tracking-wider uppercase">
                   Featured Preloaded Demo Product
                 </span>
                 <h3 className="text-sm font-bold text-slate-100 font-mono">
@@ -135,7 +135,7 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({ isOpen, onClose 
 
             <Button
               onClick={handleQuickLoadPump}
-              className="gap-2 shrink-0 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-mono font-bold"
+              className="gap-2 shrink-0 bg-red-600 hover:bg-red-500 text-white text-xs font-mono font-bold"
             >
               <Play className="w-4 h-4 fill-current" />
               <span>Launch Pump Demo</span>
@@ -146,7 +146,7 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({ isOpen, onClose 
           <div>
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-xs font-bold font-mono uppercase text-slate-300 tracking-wider flex items-center gap-2">
-                <Layers className="w-4 h-4 text-cyan-400" />
+                <Layers className="w-4 h-4 text-red-400" />
                 Live Demo 19-Step Presentation Flow
               </h4>
               <span className="text-xs font-mono text-slate-400">
@@ -165,7 +165,7 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({ isOpen, onClose 
                     onClick={() => handleStepClick(step)}
                     className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between group ${
                       isCurrent
-                        ? 'bg-cyan-950/80 border-cyan-500/70 shadow-lg shadow-cyan-950/50 ring-1 ring-cyan-500/30'
+                        ? 'bg-red-950/80 border-red-500/70 shadow-lg shadow-red-950/50 ring-1 ring-red-500/30'
                         : isCompleted
                         ? 'bg-industrial-950/90 border-slate-800 hover:border-slate-700'
                         : 'bg-slate-950/40 border-slate-850 hover:border-slate-700'
@@ -174,7 +174,7 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({ isOpen, onClose 
                     <div className="flex items-center justify-between mb-1.5">
                       <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
                         isCurrent
-                          ? 'bg-cyan-500/20 text-cyan-300'
+                          ? 'bg-red-500/20 text-red-300'
                           : isCompleted
                           ? 'bg-emerald-500/20 text-emerald-400'
                           : 'bg-slate-800 text-slate-400'
@@ -188,7 +188,7 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({ isOpen, onClose 
                       )}
                     </div>
 
-                    <span className="text-xs font-bold font-mono text-slate-200 line-clamp-1 group-hover:text-cyan-300">
+                    <span className="text-xs font-bold font-mono text-slate-200 line-clamp-1 group-hover:text-red-300">
                       {step.title}
                     </span>
                     <span className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">

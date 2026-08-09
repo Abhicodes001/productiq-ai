@@ -69,14 +69,14 @@ export const LoginPage: React.FC = () => {
             type="checkbox"
             checked={rememberMe}
             onChange={(e) => setRememberMe(e.target.checked)}
-            className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-sky-500 focus:ring-sky-500/40 focus:ring-offset-slate-950 cursor-pointer accent-sky-500"
+            className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-red-500 focus:ring-red-500/40 focus:ring-offset-slate-950 cursor-pointer accent-red-500"
           />
           <span>Remember me</span>
         </label>
         <button
           type="button"
           onClick={() => alert('Password reset instructions have been sent to your email.')}
-          className="text-slate-400 hover:text-sky-400 transition-colors text-xs"
+          className="text-slate-400 hover:text-red-400 transition-colors text-xs"
         >
           Forgot password?
         </button>
@@ -92,7 +92,7 @@ export const LoginPage: React.FC = () => {
       <div className="text-center pt-2">
         <p className="text-xs text-slate-400">
           Don't have an account?{' '}
-          <Link to="/signup" className="text-sky-400 font-semibold hover:underline">
+          <Link to="/signup" className="text-red-400 font-semibold hover:underline">
             Sign up here
           </Link>
         </p>

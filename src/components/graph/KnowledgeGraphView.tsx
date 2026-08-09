@@ -96,11 +96,11 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({
 
   const getNodeColor = (type: string) => {
     switch (type) {
-      case 'product': return 'bg-sky-500 border-sky-400 text-white shadow-sky-500/20';
+      case 'product': return 'bg-red-600 border-red-500 text-white shadow-red-500/20';
       case 'manufacturer': return 'bg-amber-500/20 border-amber-500/50 text-amber-300';
       case 'category': return 'bg-purple-500/20 border-purple-500/50 text-purple-300';
       case 'specification': return 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300';
-      case 'application': return 'bg-blue-500/20 border-blue-500/50 text-blue-300';
+      case 'application': return 'bg-red-950/60 border-red-800/60 text-red-300';
       case 'certification': return 'bg-teal-500/20 border-teal-500/50 text-teal-300';
       case 'compatible_product': return 'bg-rose-500/20 border-rose-500/50 text-rose-300';
       default: return 'bg-slate-800 border-slate-700 text-slate-300';
@@ -109,11 +109,11 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({
 
   const getNodeIcon = (type: string) => {
     switch (type) {
-      case 'product': return <Share2 className="w-4 h-4 text-sky-300" />;
+      case 'product': return <Share2 className="w-4 h-4 text-red-200" />;
       case 'manufacturer': return <Building2 className="w-4 h-4 text-amber-400" />;
       case 'category': return <Tag className="w-4 h-4 text-purple-400" />;
       case 'specification': return <SlidersHorizontal className="w-4 h-4 text-emerald-400" />;
-      case 'application': return <Briefcase className="w-4 h-4 text-blue-400" />;
+      case 'application': return <Briefcase className="w-4 h-4 text-red-400" />;
       case 'certification': return <ShieldCheck className="w-4 h-4 text-teal-400" />;
       case 'compatible_product': return <Layers className="w-4 h-4 text-rose-400" />;
       default: return <Info className="w-4 h-4 text-slate-400" />;
@@ -126,11 +126,11 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({
       <div className="p-4 bg-industrial-950 border-b border-industrial-800 flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <Share2 className="w-5 h-5 text-sky-400 animate-pulse" />
+            <Share2 className="w-5 h-5 text-red-400 animate-pulse" />
             <h3 className="text-sm font-semibold text-slate-100 font-mono tracking-wide">
               ProductIQ Knowledge Graph
             </h3>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-sky-500/10 text-sky-400 border border-sky-500/30">
+            <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-red-950 text-red-400 border border-red-800">
               Neo4j Structured Topology
             </span>
           </div>
@@ -153,7 +153,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({
               onClick={() => setSelectedFilter(f.id)}
               className={`px-2.5 py-1 rounded text-xs transition-all font-medium ${
                 selectedFilter === f.id
-                  ? 'bg-sky-500 text-white shadow-sm'
+                  ? 'bg-red-600 text-white shadow-sm'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
               }`}
             >
@@ -209,15 +209,15 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({
               className={`absolute z-20 cursor-pointer p-4 rounded-xl border-2 shadow-xl flex items-center gap-3 transition-all duration-300 hover:scale-105 ${getNodeColor('product')}`}
               style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
             >
-              <div className="p-2 bg-sky-950/60 rounded-lg border border-sky-400/40">
+              <div className="p-2 bg-red-950/60 rounded-lg border border-red-500/40">
                 {getNodeIcon('product')}
               </div>
               <div>
-                <p className="text-xs font-mono font-bold text-sky-100 max-w-[180px] truncate">
+                <p className="text-xs font-mono font-bold text-red-100 max-w-[180px] truncate">
                   {centerNode.label}
                 </p>
                 <div className="flex items-center gap-1.5 mt-1">
-                  <span className="text-[10px] font-mono text-sky-300 bg-sky-900/60 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] font-mono text-red-300 bg-red-950/80 px-1.5 py-0.5 rounded">
                     Root Product Node
                   </span>
                 </div>
@@ -243,7 +243,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({
                       y1="50%"
                       x2={`calc(50% + ${x}px)`}
                       y2={`calc(50% + ${y}px)`}
-                      stroke={isSelected ? '#38bdf8' : '#334155'}
+                      stroke={isSelected ? '#ef4444' : '#334155'}
                       strokeWidth={isSelected ? '2' : '1'}
                       strokeDasharray={node.type === 'compatible_product' ? '4 3' : 'none'}
                     />
@@ -253,7 +253,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({
                   <div
                     onClick={() => setSelectedNode(node)}
                     className={`absolute z-10 cursor-pointer p-2.5 rounded-lg border shadow-md flex items-center gap-2 transition-all duration-200 hover:scale-110 hover:z-30 ${getNodeColor(node.type)} ${
-                      isSelected ? 'ring-2 ring-sky-400 shadow-sky-500/30' : ''
+                      isSelected ? 'ring-2 ring-red-400 shadow-red-500/30' : ''
                     }`}
                     style={{
                       left: `calc(50% + ${x}px)`,
@@ -278,7 +278,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({
         <div className="w-full md:w-80 bg-industrial-900 border-t md:border-t-0 md:border-l border-industrial-800 p-4 flex flex-col justify-between">
           <div>
             <h4 className="text-xs font-bold text-slate-200 font-mono tracking-wider uppercase border-b border-slate-800 pb-2 mb-3 flex items-center gap-2">
-              <Info className="w-3.5 h-3.5 text-sky-400" />
+              <Info className="w-3.5 h-3.5 text-red-400" />
               Entity Intelligence Panel
             </h4>
 
@@ -287,7 +287,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({
                 <div className="p-3 rounded-lg bg-slate-950 border border-slate-800">
                   <div className="flex items-center gap-2 mb-1">
                     {getNodeIcon(selectedNode.type)}
-                    <span className="text-[10px] font-mono uppercase font-bold text-sky-400">
+                    <span className="text-[10px] font-mono uppercase font-bold text-red-400">
                       {selectedNode.type.replace('_', ' ')}
                     </span>
                   </div>
@@ -317,7 +317,7 @@ export const KnowledgeGraphView: React.FC<KnowledgeGraphViewProps> = ({
                   <p className="text-[11px] font-semibold text-slate-400 font-mono">CONNECTED EDGES</p>
                   {edges.filter(e => e.source === selectedNode.id || e.target === selectedNode.id).map(e => (
                     <div key={e.id} className="p-2 rounded bg-slate-950 border border-slate-800 text-[11px] flex items-center justify-between">
-                      <span className="text-sky-400 font-mono font-semibold">{e.label}</span>
+                      <span className="text-red-400 font-mono font-semibold">{e.label}</span>
                       <span className="text-slate-400 font-mono text-[10px]">Active Edge</span>
                     </div>
                   ))}
