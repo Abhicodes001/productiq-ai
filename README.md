@@ -10,7 +10,7 @@ Built for industrial manufacturers, distributors, and e-commerce platforms, Prod
 
 ---
 
-## 🚀 Features
+##  Features
 
 * 📄 Intelligent PDF & Technical Document Processing
 * 🌐 Manufacturer Website Content Extraction
@@ -28,7 +28,7 @@ Built for industrial manufacturers, distributors, and e-commerce platforms, Prod
 
 ---
 
-## 🎯 Problem Statement
+##  Problem Statement
 
 Industrial manufacturers manage product information across multiple disconnected sources, including:
 
@@ -45,7 +45,7 @@ ProductIQ AI automates this process by generating structured product intelligenc
 
 ---
 
-## 💡 Solution
+## Solution
 
 ProductIQ AI accepts minimal product information such as:
 
