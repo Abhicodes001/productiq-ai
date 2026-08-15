@@ -105,7 +105,7 @@ Commerce-Ready Export
 
 ---
 
-## 🏗️ Tech Stack
+##  Tech Stack
 
 ### Frontend
 
