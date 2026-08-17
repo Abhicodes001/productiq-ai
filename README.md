@@ -163,13 +163,13 @@ Extracts technical specifications from:
 
 ---
 
-### 🌐 Website Intelligence
+### Website Intelligence
 
 Collects product information from manufacturer websites while filtering irrelevant content.
 
 ---
 
-### 👁️ Vision AI
+###  Vision AI
 
 Analyzes product images to identify:
 
