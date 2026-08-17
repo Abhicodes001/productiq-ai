@@ -214,7 +214,7 @@ Allows users to:
 
 ---
 
-## 📊 Example Product Intelligence
+##  Example Product Intelligence
 
 ```json
 {
