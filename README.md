@@ -186,7 +186,7 @@ Provides grounded responses by retrieving relevant information directly from upl
 
 ---
 
-### 🤖 AI Enrichment
+###  AI Enrichment
 
 Identifies missing product attributes and enriches them using trusted product sources while preserving source traceability.
 
@@ -203,7 +203,7 @@ Cross-checks information across multiple sources to:
 
 ---
 
-### 👨‍💼 Human Review
+###  Human Review
 
 Allows users to:
 
