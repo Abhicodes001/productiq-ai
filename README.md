@@ -67,7 +67,7 @@ The platform automatically:
 
 ---
 
-## ⚙️ Workflow
+##  Workflow
 
 ```text
 Product Input
