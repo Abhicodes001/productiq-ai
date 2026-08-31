@@ -151,9 +151,9 @@ Commerce-Ready Export
 
 ---
 
-## 🧠 Core Modules
+##  Core Modules
 
-### 📄 Document Intelligence
+###  Document Intelligence
 
 Extracts technical specifications from:
 
