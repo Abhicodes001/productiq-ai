@@ -180,7 +180,7 @@ Analyzes product images to identify:
 
 ---
 
-### 📚 RAG Engine
+###  RAG Engine
 
 Provides grounded responses by retrieving relevant information directly from uploaded documents and website content with source citations.
 
@@ -192,7 +192,7 @@ Identifies missing product attributes and enriches them using trusted product so
 
 ---
 
-### ✅ Validation Engine
+###  Validation Engine
 
 Cross-checks information across multiple sources to:
 
@@ -234,7 +234,7 @@ Allows users to:
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 productiq-ai/
